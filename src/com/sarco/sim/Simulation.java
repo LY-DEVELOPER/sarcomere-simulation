@@ -1,87 +1,123 @@
 package com.sarco.sim;
 
-import com.sarco.sim.*;
+import static org.lwjgl.glfw.GLFW.*;
 
-public class Simulation implements Runnable{
+import org.joml.Matrix4f;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL;
+import static org.lwjgl.opengl.GL30.*;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
+import org.lwjgl.opengl.*;
+import com.sarco.sim.utilities.Timer;
+
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.MemoryUtil.NULL;
+
+import java.nio.FloatBuffer;
+
+public class Simulation implements Runnable {
+
+	Window window;
+	Timer timer;
+	ShaderProgram shader;
 	
-	 public static final int TARGET_FPS = 75;
+	
+	int VAO, VBO;
 
-	    public static final int TARGET_UPS = 30;
-
-	    private final Window window;
-
-	    private final Timer timer;
-
-	    private final ISimLogic simLogic;
-
-	    public Simulation(String windowTitle, int width, int height, boolean vSync, ISimLogic simLogic) throws Exception {
-	        window = new Window(windowTitle, width, height, vSync);
-	        this.simLogic = simLogic;
-	        timer = new Timer();
-	    }
-
-	    @Override
-	    public void run() {
-	        try {
-	            init();
-	            simLoop();
-	        } catch (Exception excp) {
-	            excp.printStackTrace();
-	        }
-	    }
-
-	    protected void init() throws Exception {
-	        window.init();
-	        timer.init();
-	        simLogic.init();
-	    }
-
-	    protected void simLoop() {
-	        float elapsedTime;
-	        float accumulator = 0f;
-	        float interval = 1f / TARGET_UPS;
-
-	        boolean running = true;
-	        while (running && !window.windowShouldClose()) {
-	            elapsedTime = timer.getElapsedTime();
-	            accumulator += elapsedTime;
-
-	            input();
-
-	            while (accumulator >= interval) {
-	                update(interval);
-	                accumulator -= interval;
-	            }
-
-	            render();
-
-	            if (!window.isvSync()) {
-	                sync();
-	            }
-	        }
-	    }
-
-	    private void sync() {
-	        float loopSlot = 1f / TARGET_FPS;
-	        double endTime = timer.getLastLoopTime() + loopSlot;
-	        while (timer.getTime() < endTime) {
-	            try {
-	                Thread.sleep(1);
-	            } catch (InterruptedException ie) {
-	            }
-	        }
-	    }
-
-	    protected void input() {
-	        simLogic.input(window);
-	    }
-
-	    protected void update(float interval) {
-	        simLogic.update(interval);
-	    }
-
-	    protected void render() {
-	        simLogic.render(window);
-	        window.update();
-	    }
+	@Override
+	public void run() {
+		init();
+		simLoop();
+		cleanUp();
 	}
+
+	public void init() {
+		window = new Window();
+		timer = new Timer();
+		shader = new ShaderProgram();
+		window.init();
+		shader.init();
+		glfwSetKeyCallback(window.getWindow(), keyCallback);
+	}
+
+	public void simLoop() {
+		boolean running = true;
+		float delta;
+		while (running && !window.shouldClose()) {
+			delta = timer.getDelta();
+
+			update(delta);
+			render();
+
+			window.update();
+		}
+	}
+
+	public void update(float delta) {
+		// create our VAO
+		VAO = glGenVertexArrays();
+		VBO = glGenBuffers();
+		glBindVertexArray(VAO);
+
+		
+		float[] vertices = new float[]{
+			     0.0f,  0.5f, 0.0f,
+			    -0.5f, -0.5f, 0.0f,
+			     0.5f, -0.5f, 0.0f
+			};
+		
+		FloatBuffer verticesBuffer = MemoryUtil.memAllocFloat(vertices.length);
+		verticesBuffer.put(vertices).flip();
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
+		
+		if (verticesBuffer != null) {
+		    MemoryUtil.memFree(verticesBuffer);
+		}
+		//How we want the open gl to interpret our vertext data
+		int posAttrib = 0;
+		int floatSize = 3;
+		glVertexAttribPointer(posAttrib, 3, GL_FLOAT, false, 0, 0);
+		glEnableVertexAttribArray(posAttrib); 
+		 // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+	    glBindBuffer(GL_ARRAY_BUFFER, 0); 
+
+	    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+	    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+	    glBindVertexArray(0); 
+
+	}
+
+	public void render() {
+		//clear the screen
+		glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		// Add our VAO to the gpu
+		glUseProgram(shader.shaderProgram);
+		glBindVertexArray(VAO);
+		//RENDER!!!
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+	}
+
+	public void cleanUp() {
+		keyCallback.free();
+		window.cleanUp();
+		shader.cleanUp();
+		glDeleteVertexArrays(VAO);
+	    glDeleteBuffers(VBO);
+	}
+
+	private GLFWKeyCallback keyCallback = new GLFWKeyCallback() {
+		@Override
+		public void invoke(long window, int key, int scancode, int action, int mods) {
+			if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+				glfwSetWindowShouldClose(window, true);
+			}
+		}
+	};
+
+}
