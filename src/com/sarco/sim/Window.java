@@ -70,7 +70,8 @@ public class Window {
 		glfwSwapInterval(1);
 		glfwShowWindow(window);
 		GL.createCapabilities();
-
+		
+		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
 	}
 

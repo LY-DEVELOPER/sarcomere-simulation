@@ -51,7 +51,7 @@ public class Mesh {
 	            indicesBuffer.put(indices).flip();
 	            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, inVBO);
 	            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
-
+	            
 	            glBindBuffer(GL_ARRAY_BUFFER, 0);
 	            glBindVertexArray(0);
 	        } finally {
@@ -65,6 +65,20 @@ public class Mesh {
 	                MemoryUtil.memFree(indicesBuffer);
 	            }
 	        }
+	}
+	
+	public void render() {
+	    // Draw the mesh
+	    glBindVertexArray(VAO);
+	    glEnableVertexAttribArray(0);
+	    glEnableVertexAttribArray(1);
+
+	    glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+
+	    // Restore state
+	    glDisableVertexAttribArray(0);
+	    glDisableVertexAttribArray(1);
+	    glBindVertexArray(0);
 	}
 
 	public int getVAO() {
