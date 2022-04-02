@@ -15,16 +15,25 @@ import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
+import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
 public class Window {
-	
+
 	private GLFWErrorCallback errorCallback = GLFWErrorCallback.createPrint(System.err);
 
 	long window;
+
+	int height;
+
+	int width;
+
+	boolean resized = false;
 
 	public void init() {
 		// TODO Auto-generated method stub
@@ -33,19 +42,36 @@ public class Window {
 			throw new IllegalStateException("Unable to initialize GLFW");
 		}
 		glfwDefaultWindowHints();
+		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-		window = glfwCreateWindow(640, 480, "SarcoSim", NULL, NULL);
+		height = 480;
+		width = 640;
+		window = glfwCreateWindow(width, height, "SarcoSim", NULL, NULL);
 		if (window == NULL) {
 			glfwTerminate();
 			throw new RuntimeException("Failed to create the GLFW window");
 		}
+		glfwSetFramebufferSizeCallback(window, (window, width, height) -> {
+			this.width = width;
+			this.height = height;
+			this.setResized(true);
+		});
+
+		// Get the resolution of the primary monitor
+		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		// Center our window
+		glfwSetWindowPos(window, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
+
 		glfwMakeContextCurrent(window);
 		glfwSwapInterval(1);
+		glfwShowWindow(window);
 		GL.createCapabilities();
+
+		glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
 	}
 
 	public void update() {
@@ -58,12 +84,30 @@ public class Window {
 		glfwTerminate();
 		errorCallback.free();
 	}
-	
+
 	public long getWindow() {
 		return window;
 	}
-	
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
 	public boolean shouldClose() {
 		return glfwWindowShouldClose(window);
+	}
+
+	public boolean isResized() {
+		// TODO Auto-generated method stub
+		return resized;
+	}
+
+	public void setResized(boolean r) {
+		// TODO Auto-generated method stub
+		resized = r;
 	}
 }
