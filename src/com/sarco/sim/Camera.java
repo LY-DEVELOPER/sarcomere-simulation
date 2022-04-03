@@ -2,21 +2,24 @@ package com.sarco.sim;
 
 import org.joml.Vector3f;
 
-public class Object {
-
-	private final Mesh mesh;
+public class Camera {
 
 	private final Vector3f position;
 
-	private float scale;
-
 	private final Vector3f rotation;
 
-	public Object(Mesh mesh) {
-		this.mesh = mesh;
-		position = new Vector3f(0, 0, 0);
-		scale = 1;
+	private float scale;
+
+	public Camera() {
+		position = new Vector3f(0, 0, 2);
 		rotation = new Vector3f(0, 0, 0);
+		scale = 1;
+
+	}
+
+	public Camera(Vector3f position, Vector3f rotation) {
+		this.position = position;
+		this.rotation = rotation;
 	}
 
 	public Vector3f getPosition() {
@@ -24,9 +27,9 @@ public class Object {
 	}
 
 	public void setPosition(float x, float y, float z) {
-		this.position.x = x;
-		this.position.y = y;
-		this.position.z = z;
+		position.x = x;
+		position.y = y;
+		position.z = z;
 	}
 
 	public void movePosition(float offsetX, float offsetY, float offsetZ) {
@@ -41,22 +44,14 @@ public class Object {
 		position.y += offsetY;
 	}
 
-	public float getScale() {
-		return scale;
-	}
-
-	public void setScale(float scale) {
-		this.scale = scale;
-	}
-
 	public Vector3f getRotation() {
 		return rotation;
 	}
 
 	public void setRotation(float x, float y, float z) {
-		this.rotation.x = x;
-		this.rotation.y = y;
-		this.rotation.z = z;
+		rotation.x = x;
+		rotation.y = y;
+		rotation.z = z;
 	}
 
 	public void moveRotation(float offsetX, float offsetY, float offsetZ) {
@@ -65,7 +60,16 @@ public class Object {
 		rotation.z += offsetZ;
 	}
 
-	public Mesh getMesh() {
-		return mesh;
+	public float getScale() {
+		return scale;
+	}
+
+	public void camZoom(float zoom) {
+		this.scale += zoom;
+		if (scale > 10f) {
+			scale = 10f;
+		} else if (scale < 0.11f) {
+			scale = 0.11f;
+		}
 	}
 }
