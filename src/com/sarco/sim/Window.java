@@ -73,6 +73,9 @@ public class Window {
 		
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+//		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 		glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
 	}
 

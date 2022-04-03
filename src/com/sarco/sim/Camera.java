@@ -63,6 +63,9 @@ public class Camera {
 	public float getScale() {
 		return scale;
 	}
+	public void setScale(float scale) {
+		this.scale = scale;
+	}
 
 	public void camZoom(float zoom) {
 		this.scale += zoom;
