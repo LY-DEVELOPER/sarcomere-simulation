@@ -13,8 +13,11 @@ import static org.lwjgl.opengl.GL30.*;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.opengl.*;
+import org.joml.Vector4f;
 
 import com.sarco.sim.utilities.LoadShader;
+import com.sarco.sim.utilities.MD5Loader;
+import com.sarco.sim.utilities.MD5Model;
 import com.sarco.sim.utilities.OBJLoader;
 import com.sarco.sim.utilities.Timer;
 
@@ -75,47 +78,52 @@ public class Simulation implements Runnable {
 		objects = new ArrayList<Object>();
 		Mesh skyBox = OBJLoader.loadMesh("/assets/skybox.obj");
 		skyBox.setTexture("assets/skybox.png");
+		Mesh grid = OBJLoader.loadMesh("/assets/grid.obj");
+		grid.setTexture("assets/grid.png");
 		Mesh length = OBJLoader.loadMesh("/assets/length.obj");
-		Mesh myosin = OBJLoader.loadMesh("/assets/myosin.obj");
-		myosin.setTexture("assets/myosin.png");
+		length.setColour(0, 0.7f, 0.7f);
+		MD5Model myosin = MD5Model.parse("/assets/myosin.md5mesh");
 		objects.add(new Object(skyBox));
 		objects.get(0).setScale(20f);
+		objects.add(new Object(grid));
+		objects.get(1).setPosition(0, -6, 0);
+		objects.get(1).setScale(20);
 		objects.add(new Object(length));
-		objects.get(1).setPosition(0, 1, 0);
+		objects.get(2).setPosition(0, 1, 0);
 		camera.setPosition(0, 0, 3);
-		camera.setScale(0.28f);
+		camera.setScale(0.2f);
 		for (int i = 0; i < 45; i++) {
-			Object myosinObj = new Object(myosin);
+			Object myosinObj = MD5Loader.process(myosin);
 			myosinObj.setRotation(118.8f + i * 36, 0, 0);
 			myosinObj.setPosition(0 - i * 0.143f,  0, 0);
 			objects.add(myosinObj);
 		}
 		for (int i = 0; i < 45; i++) {
-			Object myosinObj = new Object(myosin);
+			Object myosinObj = MD5Loader.process(myosin);
 			myosinObj.setRotation(118.8f*2 + i * 36, 0, 0);
 			myosinObj.setPosition(0 - i * 0.143f,  0, 0);
 			objects.add(myosinObj);
 		}
 		for (int i = 0; i < 45; i++) {
-			Object myosinObj = new Object(myosin);
+			Object myosinObj = MD5Loader.process(myosin);
 			myosinObj.setRotation(0 + i * 36, 0, 0);
 			myosinObj.setPosition(0 - i * 0.143f,  0, 0);
 			objects.add(myosinObj);
 		}
 		for (int i = 0; i < 45; i++) {
-			Object myosinObj = new Object(myosin);
+			Object myosinObj = MD5Loader.process(myosin);
 			myosinObj.setRotation(118.8f - i * 36,  180, 0);
 			myosinObj.setPosition(0 + i * 0.143f,  0, 0);
 			objects.add(myosinObj);
 		}
 		for (int i = 0; i < 45; i++) {
-			Object myosinObj = new Object(myosin);
+			Object myosinObj = MD5Loader.process(myosin);
 			myosinObj.setRotation(118.8f*2 - i * 36,  180, 0);
 			myosinObj.setPosition(0 + i * 0.143f,  0, 0);
 			objects.add(myosinObj);
 		}
 		for (int i = 0; i < 45; i++) {
-			Object myosinObj = new Object(myosin);
+			Object myosinObj = MD5Loader.process(myosin);
 			myosinObj.setRotation(0 - i * 36,  180, 0);
 			myosinObj.setPosition(0 + i * 0.143f,  0, 0);
 			objects.add(myosinObj);
@@ -197,7 +205,7 @@ public class Simulation implements Runnable {
 			if (key == GLFW_KEY_C && action == GLFW_PRESS) {
 				camera.setRotation(0, 0, 0);
 				camera.setPosition(0, 0, 3);
-				camera.setScale(0.28f);
+				camera.setScale(0.2f);
 			}
 		}
 	};

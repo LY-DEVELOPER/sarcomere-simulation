@@ -4,7 +4,7 @@ import org.joml.Vector3f;
 
 public class Object {
 
-	private final Mesh mesh;
+	private Mesh[] meshes;
 
 	private final Vector3f position;
 
@@ -12,11 +12,20 @@ public class Object {
 
 	private final Vector3f rotation;
 
-	public Object(Mesh mesh) {
-		this.mesh = mesh;
+	public Object() {
 		position = new Vector3f(0, 0, 0);
 		scale = 1;
 		rotation = new Vector3f(0, 0, 0);
+	}
+
+	public Object(Mesh mesh) {
+		this();
+		this.meshes = new Mesh[] { mesh };
+	}
+
+	public Object(Mesh[] meshes) {
+		this();
+		this.meshes = meshes;
 	}
 
 	public Vector3f getPosition() {
@@ -66,6 +75,23 @@ public class Object {
 	}
 
 	public Mesh getMesh() {
-		return mesh;
+		return meshes[0];
+	}
+
+	public Mesh[] getMeshes() {
+		return meshes;
+	}
+
+	public void setMeshes(Mesh[] meshes) {
+		this.meshes = meshes;
+	}
+
+	public void setMesh(Mesh mesh) {
+		if (this.meshes != null) {
+			for (Mesh currMesh : meshes) {
+				currMesh.cleanUp();
+			}
+		}
+		this.meshes = new Mesh[] { mesh };
 	}
 }
