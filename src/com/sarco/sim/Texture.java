@@ -38,8 +38,9 @@ public class Texture {
 			IntBuffer w = stack.mallocInt(1);
 			IntBuffer h = stack.mallocInt(1);
 			IntBuffer channels = stack.mallocInt(1);
-
+			
 			buf = stbi_load(fileName, w, h, channels, 4);
+			
 			if (buf == null) {
 				throw new Exception("Image file [" + fileName + "] not loaded: " + stbi_failure_reason());
 			}

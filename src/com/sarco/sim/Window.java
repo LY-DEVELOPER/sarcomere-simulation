@@ -18,10 +18,16 @@ import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
+import static org.lwjgl.stb.STBImage.*;
+
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.system.MemoryStack;
 
 public class Window {
 
@@ -71,6 +77,16 @@ public class Window {
 		glfwShowWindow(window);
 		GL.createCapabilities();
 		
+		GLFWImage image = GLFWImage.malloc(); GLFWImage.Buffer imagebf = GLFWImage.malloc(1);
+        try {
+			image.set(50, 50, loadImage("./icon.png"));
+	        imagebf.put(0, image);
+	        glfwSetWindowIcon(window, imagebf);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
@@ -116,5 +132,20 @@ public class Window {
 	public void setResized(boolean r) {
 		// TODO Auto-generated method stub
 		resized = r;
+	}
+
+	public static ByteBuffer loadImage(String path) throws Exception {
+		ByteBuffer image;
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			IntBuffer comp = stack.mallocInt(1);
+			IntBuffer w = stack.mallocInt(1);
+			IntBuffer h = stack.mallocInt(1);
+
+			image = stbi_load(path, w, h, comp, 4);
+			if (image == null) {
+				// throw new resource_error("Could not load image resources.");
+			}
+		}
+		return image;
 	}
 }
