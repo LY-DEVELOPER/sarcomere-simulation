@@ -26,13 +26,24 @@ public class ShaderProgram {
         }
         uniforms = new HashMap<>();
     }
-
+    
     public void createUniform(String uniformName) throws Exception {
         int uniformLocation = glGetUniformLocation(programId, uniformName);
         if (uniformLocation < 0) {
             throw new Exception("Could not find uniform:" + uniformName);
         }
         uniforms.put(uniformName, uniformLocation);
+    }
+    
+    public void setUniform(String uniformName, Matrix4f[] matrices) {
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            int length = matrices != null ? matrices.length : 0;
+            FloatBuffer fb = stack.mallocFloat(16 * length);
+            for (int i = 0; i < length; i++) {
+                matrices[i].get(16 * i, fb);
+            }
+            glUniformMatrix4fv(uniforms.get(uniformName), false, fb);
+        }
     }
 
     public void setUniform(String uniformName, Matrix4f value) {

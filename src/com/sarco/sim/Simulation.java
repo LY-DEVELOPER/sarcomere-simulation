@@ -16,16 +16,22 @@ import org.lwjgl.opengl.*;
 import org.joml.Vector4f;
 
 import com.sarco.sim.utilities.LoadShader;
+import com.sarco.sim.utilities.MD5AnimModel;
 import com.sarco.sim.utilities.MD5Loader;
 import com.sarco.sim.utilities.MD5Model;
 import com.sarco.sim.utilities.OBJLoader;
 import com.sarco.sim.utilities.Timer;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE2;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Simulation implements Runnable {
 
@@ -34,6 +40,11 @@ public class Simulation implements Runnable {
 	ShaderProgram shader;
 	Camera camera;
 	Transformations transformation;
+	
+	boolean moveActin;
+	int speed = 10;
+	
+	private Map<Mesh, List<Object>> meshMap;
 
 	private static final float FOV = (float) Math.toRadians(60.0f);
 
@@ -64,6 +75,7 @@ public class Simulation implements Runnable {
 		window.init();
 		shader = new ShaderProgram();
 		camera = new Camera();
+		meshMap = new HashMap<Mesh, List<Object>>();
 		shader.createVertexShader(LoadShader.load("/assets/vertex.vs"));
 		shader.createFragmentShader(LoadShader.load("/assets/fragment.fs"));
 		shader.link();
@@ -72,6 +84,7 @@ public class Simulation implements Runnable {
         shader.createUniform("texture_sampler");
         shader.createUniform("colour");
         shader.createUniform("useColour");
+		shader.createUniform("jointsMatrix");
 		glfwSetKeyCallback(window.getWindow(), keyCallback);
 		glfwSetScrollCallback(window.getWindow(), scrollCallback);
 
@@ -82,7 +95,10 @@ public class Simulation implements Runnable {
 		grid.setTexture("assets/grid.png");
 		Mesh length = OBJLoader.loadMesh("/assets/length.obj");
 		length.setColour(0, 0.7f, 0.7f);
+		Mesh actin = OBJLoader.loadMesh("/assets/actin.obj");
+		actin.setColour(0, 1f, 1f);
 		MD5Model myosin = MD5Model.parse("/assets/myosin.md5mesh");
+		MD5AnimModel animMyo = MD5AnimModel.parse("/assets/myosin.md5anim");
 		objects.add(new Object(skyBox));
 		objects.get(0).setScale(20f);
 		objects.add(new Object(grid));
@@ -90,44 +106,67 @@ public class Simulation implements Runnable {
 		objects.get(1).setScale(20);
 		objects.add(new Object(length));
 		objects.get(2).setPosition(0, 1, 0);
+		objects.add(new Object(actin));
+		objects.get(3).setPosition(5,0.4f, 0);
+		objects.add(new Object(actin));
+		objects.get(4).setPosition(5,-0.4f, 0);
+		objects.add(new Object(actin));
+		objects.get(5).setRotation(0,180, 0);
+		objects.get(5).setPosition(-5,0.4f, 0);
+		objects.add(new Object(actin));
+		objects.get(6).setRotation(0,180, 0);
+		objects.get(6).setPosition(-5,-0.4f, 0);
+		camera.setRotation(10, 20, 0);
 		camera.setPosition(0, 0, 3);
 		camera.setScale(0.2f);
 		for (int i = 0; i < 45; i++) {
-			Object myosinObj = MD5Loader.process(myosin);
+			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
 			myosinObj.setRotation(118.8f + i * 36, 0, 0);
 			myosinObj.setPosition(0 - i * 0.143f,  0, 0);
 			objects.add(myosinObj);
 		}
 		for (int i = 0; i < 45; i++) {
-			Object myosinObj = MD5Loader.process(myosin);
+			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
 			myosinObj.setRotation(118.8f*2 + i * 36, 0, 0);
 			myosinObj.setPosition(0 - i * 0.143f,  0, 0);
 			objects.add(myosinObj);
 		}
 		for (int i = 0; i < 45; i++) {
-			Object myosinObj = MD5Loader.process(myosin);
+			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
 			myosinObj.setRotation(0 + i * 36, 0, 0);
 			myosinObj.setPosition(0 - i * 0.143f,  0, 0);
 			objects.add(myosinObj);
 		}
 		for (int i = 0; i < 45; i++) {
-			Object myosinObj = MD5Loader.process(myosin);
+			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
 			myosinObj.setRotation(118.8f - i * 36,  180, 0);
 			myosinObj.setPosition(0 + i * 0.143f,  0, 0);
 			objects.add(myosinObj);
 		}
 		for (int i = 0; i < 45; i++) {
-			Object myosinObj = MD5Loader.process(myosin);
+			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
 			myosinObj.setRotation(118.8f*2 - i * 36,  180, 0);
 			myosinObj.setPosition(0 + i * 0.143f,  0, 0);
 			objects.add(myosinObj);
 		}
 		for (int i = 0; i < 45; i++) {
-			Object myosinObj = MD5Loader.process(myosin);
+			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
 			myosinObj.setRotation(0 - i * 36,  180, 0);
 			myosinObj.setPosition(0 + i * 0.143f,  0, 0);
 			objects.add(myosinObj);
 		}
+		
+		objects.forEach((object) -> {
+			Mesh[] meshes = object.getMeshes();
+			for (Mesh mesh : meshes) {
+				List<Object> list = meshMap.get(mesh);
+				if (list == null) {
+					list = new ArrayList<>();
+					meshMap.put(mesh, list);
+				}
+				list.add(object);
+			}
+		});
 	}
 
 	public void simLoop() throws Exception {
@@ -142,7 +181,30 @@ public class Simulation implements Runnable {
 	}
 
 	public void update(float delta) {
-
+		moveActin = false;;
+		if(objects.get(3).getPosition().x > 0.6) {
+			objects.forEach((object) -> {
+				if ( object instanceof AnimObject ) {
+				    ((AnimObject) object).nextFrame(speed);
+				    int frame = ((AnimObject) object).getCurrentFrameInt();
+				    if(frame >=32 && frame <=64) {
+				    	moveActin();
+				    }
+				}
+			});
+			
+			if(moveActin) {
+				float amount = (float) (0.13/32) * speed; 
+				objects.get(3).movePosition(-amount, 0, 0);
+				objects.get(4).movePosition(-amount, 0, 0);
+				objects.get(5).movePosition(-amount, 0, 0);
+				objects.get(6).movePosition(-amount, 0, 0);
+			}
+		}
+	}
+	
+	public void moveActin() {
+		moveActin = true;
 	}
 
 	public void render() {
@@ -161,17 +223,24 @@ public class Simulation implements Runnable {
 		shader.setUniform("texture_sampler", 0);
 
 		Matrix4f viewMatrix = transformation.getViewMatrix(camera);
-
-		// Render each gameItem
-		objects.forEach((object) -> {
-			Matrix4f modelViewMatrix = transformation.getModelViewMatrix(object, viewMatrix);
-			shader.setUniform("modelViewMatrix", modelViewMatrix);
-			shader.setUniform("colour", object.getMesh().getColour());
-		    shader.setUniform("useColour", object.getMesh().isTextured() ? 0 : 1);
-			// Render the mesh for this game item
-			object.getMesh().render();
-		});
-
+		
+		for (Mesh mesh : meshMap.keySet()) {
+            
+            mesh.renderList(meshMap.get(mesh), (Object object) -> {
+                
+                Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(object, viewMatrix);
+                shader.setUniform("modelViewMatrix", modelViewMatrix);
+                shader.setUniform("colour", object.getMesh().getColour());
+    		    shader.setUniform("useColour", object.getMesh().isTextured() ? 0 : 1);
+                
+    		    if ( object instanceof AnimObject ) {
+    			    AnimObject animObject = (AnimObject)object;
+    			    AnimatedFrame frame = animObject.getCurrentFrame();
+    			    shader.setUniform("jointsMatrix", frame.getJointMatrices());
+    			}
+            }
+            );
+        }
 		shader.unbind();
 	}
 
@@ -180,7 +249,9 @@ public class Simulation implements Runnable {
 		window.cleanUp();
 		shader.cleanUp();
 		objects.forEach((object) -> {
-			object.getMesh().cleanUp();
+			for(Mesh mesh : object.getMeshes()) {
+		    	mesh.cleanUp();
+		    }
 		});
 	}
 
