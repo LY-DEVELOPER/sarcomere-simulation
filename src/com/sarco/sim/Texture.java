@@ -12,6 +12,9 @@ import org.lwjgl.system.MemoryStack;
 public class Texture {
 
 	private final int id;
+	
+	private static int height;
+	private static int width;
 
 	public Texture(String fileName) throws Exception {
 		this(loadTexture(fileName));
@@ -30,8 +33,6 @@ public class Texture {
 	}
 
 	private static int loadTexture(String fileName) throws Exception {
-		int width;
-		int height;
 		ByteBuffer buf;
 		// Load Texture file
 		try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -58,8 +59,8 @@ public class Texture {
 		// Tell OpenGL how to unpack the RGBA bytes. Each component is 1 byte size
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		// Upload the texture data
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
@@ -73,5 +74,15 @@ public class Texture {
 
 	public void cleanup() {
 		glDeleteTextures(id);
+	}
+
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return width;
+	}
+
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return height;
 	}
 }

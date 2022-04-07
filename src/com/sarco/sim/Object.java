@@ -87,11 +87,6 @@ public class Object {
 	}
 
 	public void setMesh(Mesh mesh) {
-		if (this.meshes != null) {
-			for (Mesh currMesh : meshes) {
-				currMesh.cleanUp();
-			}
-		}
 		this.meshes = new Mesh[] { mesh };
 	}
 }

@@ -23,7 +23,7 @@ public class Mesh {
 
 	private final int vertexCount;
 	private Texture texture;
-	private Vector3f colour = new Vector3f(0,0.5f,0.5f);;
+	private Vector4f colour = new Vector4f(0,0.5f,0.5f, 1);;
 
 	public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices) {
 		this(positions, textCoords, normals, indices,
@@ -213,6 +213,15 @@ public class Mesh {
 			e.printStackTrace();
 		}
 	}
+	
+	public void setTexture(Texture sTexture) {
+		try {
+			this.texture = sTexture;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public Texture getTexture() {
 		return texture;
@@ -226,13 +235,14 @@ public class Mesh {
 		}
 	}
 
-	public void setColour(float x, float y, float z) {
+	public void setColour(float x, float y, float z, float w) {
 		colour.x = x;
 		colour.y = y;
 		colour.z = z;
+		colour.w = w;
 	}
 
-	public Vector3f getColour() {
+	public Vector4f getColour() {
 		return colour;
 	}
 

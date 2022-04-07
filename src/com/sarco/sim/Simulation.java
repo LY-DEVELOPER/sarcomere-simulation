@@ -38,6 +38,7 @@ public class Simulation implements Runnable {
 	Window window;
 	Timer timer;
 	ShaderProgram shader;
+	ShaderProgram hudShader;
 	Camera camera;
 	Transformations transformation;
 
@@ -45,9 +46,10 @@ public class Simulation implements Runnable {
 	boolean autoPlay = false;
 	boolean moveActin;
 	boolean actinReturn = false;
-	int speed = 16;
+	int speed = 8;
 
 	private Map<Mesh, List<Object>> meshMap;
+	private Map<Mesh, List<TextObject>> textMeshMap;
 
 	private static final float FOV = (float) Math.toRadians(60.0f);
 
@@ -58,6 +60,7 @@ public class Simulation implements Runnable {
 	float i = 0.1f;
 
 	ArrayList<Object> objects;
+	ArrayList<TextObject> textObjects;
 
 	@Override
 	public void run() {
@@ -79,6 +82,8 @@ public class Simulation implements Runnable {
 		shader = new ShaderProgram();
 		camera = new Camera();
 		meshMap = new HashMap<Mesh, List<Object>>();
+		glfwSetKeyCallback(window.getWindow(), keyCallback);
+		glfwSetScrollCallback(window.getWindow(), scrollCallback);
 		shader.createVertexShader(LoadShader.load("/assets/vertex.vs"));
 		shader.createFragmentShader(LoadShader.load("/assets/fragment.fs"));
 		shader.link();
@@ -88,89 +93,52 @@ public class Simulation implements Runnable {
 		shader.createUniform("colour");
 		shader.createUniform("useColour");
 		shader.createUniform("jointsMatrix");
-		glfwSetKeyCallback(window.getWindow(), keyCallback);
-		glfwSetScrollCallback(window.getWindow(), scrollCallback);
-
-		objects = new ArrayList<Object>();
-		Mesh skyBox = OBJLoader.loadMesh("/assets/skybox.obj");
-		skyBox.setColour(0.5f, 0.5f, 0.5f);
-		skyBox.setTexture("skybox.png");
-		Mesh grid = OBJLoader.loadMesh("/assets/grid.obj");
-		grid.setTexture("grid.png");
-		Mesh length = OBJLoader.loadMesh("/assets/length.obj");
-		length.setColour(0, 0.7f, 0.7f);
-		Mesh actin = OBJLoader.loadMesh("/assets/actin.obj");
-		actin.setColour(0, 1f, 1f);
-		MD5Model myosin = MD5Model.parse("/assets/myosin.md5mesh");
-		MD5AnimModel animMyo = MD5AnimModel.parse("/assets/myosin.md5anim");
-		objects.add(new Object(skyBox));
-		objects.get(0).setScale(20f);
-		objects.add(new Object(grid));
-		objects.get(1).setPosition(0, -6, 0);
-		objects.get(1).setScale(20);
-		objects.add(new Object(length));
-		objects.get(2).setPosition(0, 1, 0);
-		objects.add(new Object(actin));
-		objects.get(3).setPosition(5, 0.4f, 0);
-		objects.add(new Object(actin));
-		objects.get(4).setPosition(5, -0.4f, 0);
-		objects.add(new Object(actin));
-		objects.get(5).setRotation(0, 180, 0);
-		objects.get(5).setPosition(-5, 0.4f, 0);
-		objects.add(new Object(actin));
-		objects.get(6).setRotation(0, 180, 0);
-		objects.get(6).setPosition(-5, -0.4f, 0);
+		hudShader = new ShaderProgram();
+		hudShader.createVertexShader(LoadShader.load("/assets/hud_vertex.vs"));
+		hudShader.createFragmentShader(LoadShader.load("/assets/hud_fragment.fs"));
+		hudShader.link();
+		hudShader.createUniform("projModelMatrix");
+		hudShader.createUniform("colour");
 		camera.setRotation(10, 20, 0);
 		camera.setPosition(0, 0, 3);
 		camera.setScale(0.2f);
-		for (int i = 0; i < 45; i++) {
-			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
-			myosinObj.setRotation(118.8f + i * 36, 0, 0);
-			myosinObj.setPosition(0 - i * 0.143f, 0, 0);
-			objects.add(myosinObj);
-		}
-		for (int i = 0; i < 45; i++) {
-			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
-			myosinObj.setRotation(118.8f * 2 + i * 36, 0, 0);
-			myosinObj.setPosition(0 - i * 0.143f, 0, 0);
-			objects.add(myosinObj);
-		}
-		for (int i = 0; i < 45; i++) {
-			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
-			myosinObj.setRotation(0 + i * 36, 0, 0);
-			myosinObj.setPosition(0 - i * 0.143f, 0, 0);
-			objects.add(myosinObj);
-		}
-		for (int i = 0; i < 45; i++) {
-			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
-			myosinObj.setRotation(118.8f - i * 36, 180, 0);
-			myosinObj.setPosition(0 + i * 0.143f, 0, 0);
-			objects.add(myosinObj);
-		}
-		for (int i = 0; i < 45; i++) {
-			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
-			myosinObj.setRotation(118.8f * 2 - i * 36, 180, 0);
-			myosinObj.setPosition(0 + i * 0.143f, 0, 0);
-			objects.add(myosinObj);
-		}
-		for (int i = 0; i < 45; i++) {
-			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
-			myosinObj.setRotation(0 - i * 36, 180, 0);
-			myosinObj.setPosition(0 + i * 0.143f, 0, 0);
-			objects.add(myosinObj);
-		}
 
-		objects.forEach((object) -> {
-			Mesh[] meshes = object.getMeshes();
-			for (Mesh mesh : meshes) {
-				List<Object> list = meshMap.get(mesh);
-				if (list == null) {
-					list = new ArrayList<>();
-					meshMap.put(mesh, list);
-				}
-				list.add(object);
-			}
-		});
+		objects = CreateSceneObjects.gen();
+
+		textObjects = new ArrayList<TextObject>();
+
+		textObjects.add(new TextObject("AutoPlay:Off", "src/assets/font.png", 16, 16));
+		textObjects.get(0).setPosition(5f, 5f, 1);
+		textObjects.get(0).setScale(0.3f);
+		textObjects.add(new TextObject("Contracting:Off", "src/assets/font.png", 16, 16));
+		textObjects.get(1).setPosition(260f, 5f, 1);
+		textObjects.get(1).setScale(0.3f);
+		textObjects.add(new TextObject("Speed:" + speed + "/64", "src/assets/font.png", 16, 16));
+		textObjects.get(2).setPosition(570f, 5f, 1);
+		textObjects.get(2).setScale(0.3f);
+		
+		textObjects.add(new TextObject("Controls:", "src/assets/font.png", 16, 16));
+		textObjects.get(3).setPosition(5f, window.getHeight() - 215, 1);
+		textObjects.get(3).setScale(0.3f);
+		textObjects.add(new TextObject("Arrow Keys: Rotate Camera", "src/assets/font.png", 16, 16));
+		textObjects.get(4).setPosition(5f, window.getHeight() - 185, 1);
+		textObjects.get(4).setScale(0.3f);
+		textObjects.add(new TextObject("Scroll: Zoom", "src/assets/font.png", 16, 16));
+		textObjects.get(5).setPosition(5f, window.getHeight() - 155, 1);
+		textObjects.get(5).setScale(0.3f);
+		textObjects.add(new TextObject("C: Center Camera", "src/assets/font.png", 16, 16));
+		textObjects.get(6).setPosition(5f, window.getHeight() - 125, 1);
+		textObjects.get(6).setScale(0.3f);
+		textObjects.add(new TextObject("V/B: Speed Down/Up", "src/assets/font.png", 16, 16));
+		textObjects.get(7).setPosition(5f, window.getHeight() - 95, 1);
+		textObjects.get(7).setScale(0.3f);
+		textObjects.add(new TextObject("A: Toggle AutoPlay", "src/assets/font.png", 16, 16));
+		textObjects.get(8).setPosition(5f, window.getHeight() - 65, 1);
+		textObjects.get(8).setScale(0.3f);
+		textObjects.add(new TextObject("Space Bar: Contract", "src/assets/font.png", 16, 16));
+		textObjects.get(9).setPosition(5f, window.getHeight() - 35, 1);
+		textObjects.get(9).setScale(0.3f);
+
 	}
 
 	public void simLoop() throws Exception {
@@ -186,7 +154,7 @@ public class Simulation implements Runnable {
 
 	public void update(float delta) {
 		moveActin = false;
-		if(objects.get(3).getPosition().x <= 0.3 && autoPlay){ 
+		if (objects.get(3).getPosition().x <= 0.3 && autoPlay) {
 			contract = false;
 		}
 		if (objects.get(3).getPosition().x > 0.3 && !actinReturn && contract) {
@@ -207,7 +175,7 @@ public class Simulation implements Runnable {
 				objects.get(5).movePosition(-amount, 0, 0);
 				objects.get(6).movePosition(-amount, 0, 0);
 			}
-		}else if (!actinReturn && !contract) {
+		} else if (!actinReturn && !contract) {
 			objects.forEach((object) -> {
 				if (object instanceof AnimObject) {
 					((AnimObject) object).nextFrame(speed);
@@ -224,11 +192,32 @@ public class Simulation implements Runnable {
 				objects.get(4).movePosition(amount, 0, 0);
 				objects.get(5).movePosition(amount, 0, 0);
 				objects.get(6).movePosition(amount, 0, 0);
-			}else if(autoPlay) {
+			} else if (autoPlay) {
 				contract = true;
 				actinReturn = false;
 			}
 		}
+		if (autoPlay) {
+			textObjects.get(0).setText("AutoPlay:On");
+		} else {
+			textObjects.get(0).setText("AutoPlay:Off");
+		}
+
+		if (contract) {
+			textObjects.get(1).setText("Contracting:On");
+		} else {
+			textObjects.get(1).setText("Contracting:Off");
+		}
+
+		textObjects.get(2).setText("Speed:" + speed + "/64");
+		
+		textObjects.get(3).setPosition(5f, window.getHeight() - 220, 1);
+		textObjects.get(4).setPosition(5f, window.getHeight() - 190, 1);
+		textObjects.get(5).setPosition(5f, window.getHeight() - 160, 1);
+		textObjects.get(6).setPosition(5f, window.getHeight() - 130, 1);
+		textObjects.get(7).setPosition(5f, window.getHeight() - 100, 1);
+		textObjects.get(8).setPosition(5f, window.getHeight() - 70, 1);
+		textObjects.get(9).setPosition(5f, window.getHeight() - 40, 1);
 	}
 
 	public void moveActin() {
@@ -252,23 +241,40 @@ public class Simulation implements Runnable {
 
 		Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 
-		for (Mesh mesh : meshMap.keySet()) {
+		for (Object object : objects) {
 
-			mesh.renderList(meshMap.get(mesh), (Object object) -> {
+			Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(object, viewMatrix);
+			shader.setUniform("modelViewMatrix", modelViewMatrix);
+			shader.setUniform("colour", object.getMesh().getColour());
+			shader.setUniform("useColour", object.getMesh().isTextured() ? 0 : 1);
 
-				Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(object, viewMatrix);
-				shader.setUniform("modelViewMatrix", modelViewMatrix);
-				shader.setUniform("colour", object.getMesh().getColour());
-				shader.setUniform("useColour", object.getMesh().isTextured() ? 0 : 1);
-
-				if (object instanceof AnimObject) {
-					AnimObject animObject = (AnimObject) object;
-					AnimatedFrame frame = animObject.getCurrentFrame();
-					shader.setUniform("jointsMatrix", frame.getJointMatrices());
-				}
-			});
+			if (object instanceof AnimObject) {
+				AnimObject animObject = (AnimObject) object;
+				AnimatedFrame frame = animObject.getCurrentFrame();
+				shader.setUniform("jointsMatrix", frame.getJointMatrices());
+			}
+			
+			for(Mesh mesh : object.getMeshes()) {
+				mesh.render();
+			}
 		}
 		shader.unbind();
+
+		hudShader.bind();
+
+		Matrix4f ortho = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
+		for (Object object : textObjects) {
+			Mesh mesh = object.getMesh();
+			// Set ortohtaphic and model matrix for this HUD item
+			Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(object, ortho);
+			hudShader.setUniform("projModelMatrix", projModelMatrix);
+			hudShader.setUniform("colour", object.getMesh().getColour());
+
+			// Render the mesh for this HUD item
+			mesh.render();
+		}
+
+		hudShader.unbind();
 	}
 
 	public void cleanUp() {
@@ -276,6 +282,11 @@ public class Simulation implements Runnable {
 		window.cleanUp();
 		shader.cleanUp();
 		objects.forEach((object) -> {
+			for (Mesh mesh : object.getMeshes()) {
+				mesh.cleanUp();
+			}
+		});
+		textObjects.forEach((object) -> {
 			for (Mesh mesh : object.getMeshes()) {
 				mesh.cleanUp();
 			}
@@ -315,8 +326,8 @@ public class Simulation implements Runnable {
 			}
 			if (key == GLFW_KEY_A && action == GLFW_PRESS) {
 				autoPlay = !autoPlay;
-				contract = true;	
-				if(actinReturn) {
+				contract = true;
+				if (actinReturn) {
 					actinReturn = false;
 				}
 				if (!autoPlay) {

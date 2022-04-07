@@ -54,8 +54,8 @@ public class Window {
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-		height = 480;
-		width = 640;
+		height = 720;
+		width = 1280;
 		window = glfwCreateWindow(width, height, "SarcoSim", NULL, NULL);
 		if (window == NULL) {
 			glfwTerminate();
@@ -79,7 +79,7 @@ public class Window {
 		
 		GLFWImage image = GLFWImage.malloc(); GLFWImage.Buffer imagebf = GLFWImage.malloc(1);
         try {
-			image.set(50, 50, loadImage("./icon.png"));
+			image.set(50, 50, loadImage("src/assets/icon.png"));
 	        imagebf.put(0, image);
 	        glfwSetWindowIcon(window, imagebf);
 		} catch (Exception e) {

@@ -11,7 +11,7 @@ joints {
 }
 
 mesh {
-  shader "myosin.png"
+  shader "src/assets/myosin.png"
   numverts 40
   vert 0 ( 0.4570372403 0.9218218327 ) 0 1
   vert 1 ( 0.1920233965 0.0566825867 ) 1 1
