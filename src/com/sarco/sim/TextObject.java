@@ -30,7 +30,7 @@ public class TextObject extends Object {
 		this.setMesh(buildMesh(texture, numCols, numRows));
 	}
 
-	private Mesh buildMesh(Texture texture, int numCols, int numRows) {
+	private Mesh buildMesh(Texture texture, int numCols, int numRows) throws Exception {
         byte[] chars = text.getBytes(Charset.forName("ISO-8859-1"));
         int numChars = chars.length;
 
@@ -93,6 +93,7 @@ public class TextObject extends Object {
         mesh.setTexture(texture);
         return mesh;
 	}
+	
 	public String getText() {
 	    return text;
 	}
@@ -101,6 +102,11 @@ public class TextObject extends Object {
 	    this.text = text;
 	    Texture texture = this.getMesh().getTexture();
 	    this.getMesh().deleteBuffers();
-	    this.setMesh(buildMesh(texture, numCols, numRows));
+	    try {
+			this.setMesh(buildMesh(texture, numCols, numRows));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

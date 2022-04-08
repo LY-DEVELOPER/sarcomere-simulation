@@ -79,7 +79,7 @@ public class Window {
 		
 		GLFWImage image = GLFWImage.malloc(); GLFWImage.Buffer imagebf = GLFWImage.malloc(1);
         try {
-			image.set(50, 50, loadImage("src/assets/icon.png"));
+			image.set(50, 50, loadImage("./textures/icon.png"));
 	        imagebf.put(0, image);
 	        glfwSetWindowIcon(window, imagebf);
 		} catch (Exception e) {

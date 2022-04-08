@@ -14,9 +14,9 @@ public class CreateSceneObjects {
 		ArrayList<Object> objects = new ArrayList<Object>();
 		Mesh skyBox = OBJLoader.loadMesh("/assets/skybox.obj");
 		skyBox.setColour(0.5f, 0.5f, 0.5f, 1);
-		skyBox.setTexture("src/assets/skybox.png");
+		skyBox.setTexture("./textures/skybox.png");
 		Mesh grid = OBJLoader.loadMesh("/assets/grid.obj");
-		grid.setTexture("src/assets/grid.png");
+		grid.setTexture("./textures/grid.png");
 		Mesh length = OBJLoader.loadMesh("/assets/length.obj");
 		length.setColour(0, 0.7f, 0.7f, 0.5f);
 		Mesh actin = OBJLoader.loadMesh("/assets/actin.obj");

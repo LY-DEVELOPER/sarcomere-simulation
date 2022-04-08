@@ -106,36 +106,38 @@ public class Simulation implements Runnable {
 		objects = CreateSceneObjects.gen();
 
 		textObjects = new ArrayList<TextObject>();
+		
+		String font = "./textures/font.png";
 
-		textObjects.add(new TextObject("AutoPlay:Off", "src/assets/font.png", 16, 16));
+		textObjects.add(new TextObject("AutoPlay:Off", font, 16, 16));
 		textObjects.get(0).setPosition(5f, 5f, 1);
 		textObjects.get(0).setScale(0.3f);
-		textObjects.add(new TextObject("Contracting:Off", "src/assets/font.png", 16, 16));
+		textObjects.add(new TextObject("Contracting:Off", font, 16, 16));
 		textObjects.get(1).setPosition(260f, 5f, 1);
 		textObjects.get(1).setScale(0.3f);
-		textObjects.add(new TextObject("Speed:" + speed + "/64", "src/assets/font.png", 16, 16));
+		textObjects.add(new TextObject("Speed:" + speed + "/64", font, 16, 16));
 		textObjects.get(2).setPosition(570f, 5f, 1);
 		textObjects.get(2).setScale(0.3f);
 		
-		textObjects.add(new TextObject("Controls:", "src/assets/font.png", 16, 16));
+		textObjects.add(new TextObject("Controls:", font, 16, 16));
 		textObjects.get(3).setPosition(5f, window.getHeight() - 215, 1);
 		textObjects.get(3).setScale(0.3f);
-		textObjects.add(new TextObject("Arrow Keys: Rotate Camera", "src/assets/font.png", 16, 16));
+		textObjects.add(new TextObject("Arrow Keys: Rotate Camera", font, 16, 16));
 		textObjects.get(4).setPosition(5f, window.getHeight() - 185, 1);
 		textObjects.get(4).setScale(0.3f);
-		textObjects.add(new TextObject("Scroll: Zoom", "src/assets/font.png", 16, 16));
+		textObjects.add(new TextObject("Scroll: Zoom", font, 16, 16));
 		textObjects.get(5).setPosition(5f, window.getHeight() - 155, 1);
 		textObjects.get(5).setScale(0.3f);
-		textObjects.add(new TextObject("C: Center Camera", "src/assets/font.png", 16, 16));
+		textObjects.add(new TextObject("C: Center Camera", font, 16, 16));
 		textObjects.get(6).setPosition(5f, window.getHeight() - 125, 1);
 		textObjects.get(6).setScale(0.3f);
-		textObjects.add(new TextObject("V/B: Speed Down/Up", "src/assets/font.png", 16, 16));
+		textObjects.add(new TextObject("V/B: Speed Down/Up", font, 16, 16));
 		textObjects.get(7).setPosition(5f, window.getHeight() - 95, 1);
 		textObjects.get(7).setScale(0.3f);
-		textObjects.add(new TextObject("A: Toggle AutoPlay", "src/assets/font.png", 16, 16));
+		textObjects.add(new TextObject("A: Toggle AutoPlay", font, 16, 16));
 		textObjects.get(8).setPosition(5f, window.getHeight() - 65, 1);
 		textObjects.get(8).setScale(0.3f);
-		textObjects.add(new TextObject("Space Bar: Contract", "src/assets/font.png", 16, 16));
+		textObjects.add(new TextObject("Space Bar: Contract", font, 16, 16));
 		textObjects.get(9).setPosition(5f, window.getHeight() - 35, 1);
 		textObjects.get(9).setScale(0.3f);
 
@@ -335,12 +337,12 @@ public class Simulation implements Runnable {
 					contract = false;
 				}
 			}
-			if (key == GLFW_KEY_V && action == GLFW_PRESS) {
+			if (key == GLFW_KEY_V && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
 				if (speed > 1) {
 					speed--;
 				}
 			}
-			if (key == GLFW_KEY_B && action == GLFW_PRESS) {
+			if (key == GLFW_KEY_B && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
 				if (speed < 64) {
 					speed++;
 				}
