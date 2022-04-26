@@ -4,8 +4,10 @@ import static org.lwjgl.glfw.GLFW.*;
 
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
+import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -58,6 +60,9 @@ public class Simulation implements Runnable {
 	private static final float Z_FAR = 1000.f;
 
 	float i = 0.1f;
+	
+	double mouseX;
+	double mouseY;
 
 	ArrayList<Object> objects;
 	ArrayList<TextObject> textObjects;
@@ -84,6 +89,8 @@ public class Simulation implements Runnable {
 		meshMap = new HashMap<Mesh, List<Object>>();
 		glfwSetKeyCallback(window.getWindow(), keyCallback);
 		glfwSetScrollCallback(window.getWindow(), scrollCallback);
+		glfwSetCursorPosCallback(window.getWindow(), cursorCallback);
+		glfwSetMouseButtonCallback(window.getWindow(), mouseCallback);
 		shader.createVertexShader(LoadShader.load("/assets/vertex.vs"));
 		shader.createFragmentShader(LoadShader.load("/assets/fragment.fs"));
 		shader.link();
@@ -106,11 +113,11 @@ public class Simulation implements Runnable {
 		objects = CreateSceneObjects.gen();
 
 		textObjects = new ArrayList<TextObject>();
-		
+
 		String font = "./textures/font.png";
 
 		textObjects.add(new TextObject("AutoPlay:Off", font, 16, 16));
-		textObjects.get(0).setPosition(5f, 5f, 1);
+		textObjects.get(0).setPosition(10f, 5f, 1);
 		textObjects.get(0).setScale(0.3f);
 		textObjects.add(new TextObject("Contracting:Off", font, 16, 16));
 		textObjects.get(1).setPosition(260f, 5f, 1);
@@ -118,7 +125,7 @@ public class Simulation implements Runnable {
 		textObjects.add(new TextObject("Speed:" + speed + "/64", font, 16, 16));
 		textObjects.get(2).setPosition(570f, 5f, 1);
 		textObjects.get(2).setScale(0.3f);
-		
+
 		textObjects.add(new TextObject("Controls:", font, 16, 16));
 		textObjects.get(3).setPosition(5f, window.getHeight() - 215, 1);
 		textObjects.get(3).setScale(0.3f);
@@ -140,7 +147,7 @@ public class Simulation implements Runnable {
 		textObjects.add(new TextObject("Space Bar: Contract", font, 16, 16));
 		textObjects.get(9).setPosition(5f, window.getHeight() - 35, 1);
 		textObjects.get(9).setScale(0.3f);
-
+		glViewport(0,0,window.getWidth(),window.getHeight());
 	}
 
 	public void simLoop() throws Exception {
@@ -212,7 +219,7 @@ public class Simulation implements Runnable {
 		}
 
 		textObjects.get(2).setText("Speed:" + speed + "/64");
-		
+
 		textObjects.get(3).setPosition(5f, window.getHeight() - 220, 1);
 		textObjects.get(4).setPosition(5f, window.getHeight() - 190, 1);
 		textObjects.get(5).setPosition(5f, window.getHeight() - 160, 1);
@@ -230,13 +237,14 @@ public class Simulation implements Runnable {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
 		if (window.isResized()) {
-			glViewport(0, 0, window.getWidth(), window.getHeight());
+			glViewport(0,0,window.getWidth(),window.getHeight());
 			window.setResized(false);
 		}
 		shader.bind();
 		// Update projection Matrix
-		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
-				Z_NEAR, Z_FAR);
+		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV,
+				window.getWidth(),
+				window.getHeight(), Z_NEAR, Z_FAR);
 		shader.setUniform("projectionMatrix", projectionMatrix);
 
 		shader.setUniform("texture_sampler", 0);
@@ -255,8 +263,8 @@ public class Simulation implements Runnable {
 				AnimatedFrame frame = animObject.getCurrentFrame();
 				shader.setUniform("jointsMatrix", frame.getJointMatrices());
 			}
-			
-			for(Mesh mesh : object.getMeshes()) {
+
+			for (Mesh mesh : object.getMeshes()) {
 				mesh.render();
 			}
 		}
@@ -349,6 +357,29 @@ public class Simulation implements Runnable {
 			}
 		}
 	};
+	
+	private GLFWMouseButtonCallback mouseCallback = new GLFWMouseButtonCallback() {
+
+		@Override
+		public void invoke(long window, int button, int action, int mods) {
+			// TODO Auto-generated method stub
+		    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		    	for(TextObject obj : textObjects) {
+		    		if(obj.isMouseOver(mouseX, mouseY)) {
+		    			System.out.println("You clicked " + obj.getText());
+			    		if(obj.getText().equals("Controls:")) {
+			    			textObjects.get(4).toggleVis();
+			    			textObjects.get(5).toggleVis();
+			    			textObjects.get(6).toggleVis();
+			    			textObjects.get(7).toggleVis();
+			    			textObjects.get(8).toggleVis();
+			    			textObjects.get(9).toggleVis();
+			    		}
+		    		}
+		    	}
+		    }
+		}
+	};
 
 	private GLFWScrollCallback scrollCallback = new GLFWScrollCallback() {
 
@@ -357,6 +388,16 @@ public class Simulation implements Runnable {
 			// TODO Auto-generated method stub
 			camera.camZoom((float) yoffset / 10);
 		}
+	};
+	private GLFWCursorPosCallback cursorCallback = new GLFWCursorPosCallback() {
+
+		@Override
+		public void invoke(long window, double xpos, double ypos) {
+			// TODO Auto-generated method stub
+			mouseX = xpos;
+			mouseY = ypos;
+		}
+		
 	};
 
 }

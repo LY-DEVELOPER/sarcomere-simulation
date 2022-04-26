@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Vector4f;
+import org.joml.Vector4i;
 
 import com.sarco.sim.utilities.MD5Loader;
 
@@ -108,5 +109,34 @@ public class TextObject extends Object {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public Vector4i getBorders() {
+		int x1, x2, y1, y2;
+		int size = this.text.length();
+		int width = size * Math.round(64 * this.getScale());
+		x1 = (int) this.getPosition().x;
+		x2 = x1 + width;
+		y1 = (int) this.getPosition().y;
+		y2 = y1 + Math.round(128 * this.getScale());
+		return(new Vector4i(x1, x2, y1, y2));
+	}
+	
+	public void toggleVis() {
+		if(this.colour.w > 0) {
+			this.colour.w = 0;
+		}else {
+			this.colour.w = 1;
+		}
+		
+		setText(this.getText());
+	}
+	
+	public boolean isMouseOver(double x, double y) {
+		Vector4i border = this.getBorders();
+		if(x > border.x && x < border.y && y > border.z && y < border.w) {
+			return true;
+		}
+		return false;
 	}
 }
