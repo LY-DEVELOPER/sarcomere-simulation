@@ -118,35 +118,52 @@ public class Simulation implements Runnable {
 
 		textObjects.add(new TextObject("AutoPlay:Off", font, 16, 16));
 		textObjects.get(0).setPosition(10f, 5f, 1);
-		textObjects.get(0).setScale(0.3f);
 		textObjects.add(new TextObject("Contracting:Off", font, 16, 16));
-		textObjects.get(1).setPosition(260f, 5f, 1);
-		textObjects.get(1).setScale(0.3f);
+		textObjects.get(1).setPosition(window.getWidth() - 300f, 5f, 1);
+		textObjects.add(new TextObject("Appearance \21", font, 16, 16));
+		textObjects.get(2).setPosition(10f, 35 + 5, 1);
+		textObjects.add(new TextObject("View \21", font, 16, 16));
+		textObjects.get(3).setPosition(10f, 35 * 2 + 5, 1);
+		textObjects.add(new TextObject("Performance \21", font, 16, 16));
+		textObjects.get(4).setPosition(10f, 35 * 3 + 5, 1);
+		textObjects.add(new TextObject("Controls \21", font, 16, 16));
+		textObjects.get(5).setPosition(10f, 35 * 4 + 5, 1);
+		textObjects.add(new TextObject("Myosin Colour", font, 16, 16));
+		textObjects.get(6).setPosition(20f, 35 * 2 + 5, 1);
+		textObjects.add(new TextObject("Myosin Transparency", font, 16, 16));
+		textObjects.get(7).setPosition(20f, 35 * 3 + 5, 1);
+		textObjects.add(new TextObject("Actin Colour", font, 16, 16));
+		textObjects.get(8).setPosition(20f, 35 * 4 + 5, 1);
+		textObjects.add(new TextObject("Actin Transparency", font, 16, 16));
+		textObjects.get(9).setPosition(20f, 35 * 5 + 5, 1);
+		textObjects.add(new TextObject("Re-Centre Camera", font, 16, 16));
+		textObjects.get(10).setPosition(20f, 35 * 3 + 5, 1);
 		textObjects.add(new TextObject("Speed:" + speed + "/64", font, 16, 16));
-		textObjects.get(2).setPosition(570f, 5f, 1);
-		textObjects.get(2).setScale(0.3f);
-
-		textObjects.add(new TextObject("Controls:", font, 16, 16));
-		textObjects.get(3).setPosition(5f, window.getHeight() - 215, 1);
-		textObjects.get(3).setScale(0.3f);
+		textObjects.get(11).setPosition(20f, 35 * 4 + 5, 1);
+		textObjects.add(new TextObject("Quality: Low", font, 16, 16));
+		textObjects.get(12).setPosition(20f, 35 * 4 + 5, 1);
+		textObjects.add(new TextObject("V-sync: On", font, 16, 16));
+		textObjects.get(13).setPosition(20f, 35 * 5 + 5, 1);
+		textObjects.add(new TextObject("FPS: 60", font, 16, 16));
+		textObjects.get(14).setPosition(20f, 35 * 6 + 5, 1);
 		textObjects.add(new TextObject("Arrow Keys: Rotate Camera", font, 16, 16));
-		textObjects.get(4).setPosition(5f, window.getHeight() - 185, 1);
-		textObjects.get(4).setScale(0.3f);
+		textObjects.get(15).setPosition(20f, 35 * 5 + 5, 1);
 		textObjects.add(new TextObject("Scroll: Zoom", font, 16, 16));
-		textObjects.get(5).setPosition(5f, window.getHeight() - 155, 1);
-		textObjects.get(5).setScale(0.3f);
+		textObjects.get(16).setPosition(20f, 35 * 6 + 5, 1);
 		textObjects.add(new TextObject("C: Center Camera", font, 16, 16));
-		textObjects.get(6).setPosition(5f, window.getHeight() - 125, 1);
-		textObjects.get(6).setScale(0.3f);
+		textObjects.get(17).setPosition(20f, 35 * 7 + 5, 1);
 		textObjects.add(new TextObject("V/B: Speed Down/Up", font, 16, 16));
-		textObjects.get(7).setPosition(5f, window.getHeight() - 95, 1);
-		textObjects.get(7).setScale(0.3f);
+		textObjects.get(18).setPosition(20f, 35 * 8 + 5, 1);
 		textObjects.add(new TextObject("A: Toggle AutoPlay", font, 16, 16));
-		textObjects.get(8).setPosition(5f, window.getHeight() - 65, 1);
-		textObjects.get(8).setScale(0.3f);
+		textObjects.get(19).setPosition(20f, 35 * 9 + 5, 1);
 		textObjects.add(new TextObject("Space Bar: Contract", font, 16, 16));
-		textObjects.get(9).setPosition(5f, window.getHeight() - 35, 1);
-		textObjects.get(9).setScale(0.3f);
+		textObjects.get(20).setPosition(20f, 35 * 10 + 5, 1);
+		for(TextObject obj : textObjects) {
+			obj.setScale(0.3f);
+		}
+		for(int i = 6; i < textObjects.size(); i++) {
+			textObjects.get(i).toggleVis();	
+		}
 		glViewport(0,0,window.getWidth(),window.getHeight());
 	}
 
@@ -218,15 +235,7 @@ public class Simulation implements Runnable {
 			textObjects.get(1).setText("Contracting:Off");
 		}
 
-		textObjects.get(2).setText("Speed:" + speed + "/64");
-
-		textObjects.get(3).setPosition(5f, window.getHeight() - 220, 1);
-		textObjects.get(4).setPosition(5f, window.getHeight() - 190, 1);
-		textObjects.get(5).setPosition(5f, window.getHeight() - 160, 1);
-		textObjects.get(6).setPosition(5f, window.getHeight() - 130, 1);
-		textObjects.get(7).setPosition(5f, window.getHeight() - 100, 1);
-		textObjects.get(8).setPosition(5f, window.getHeight() - 70, 1);
-		textObjects.get(9).setPosition(5f, window.getHeight() - 40, 1);
+		textObjects.get(11).setText("Speed:" + speed + "/64");
 	}
 
 	public void moveActin() {
@@ -366,14 +375,81 @@ public class Simulation implements Runnable {
 		    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		    	for(TextObject obj : textObjects) {
 		    		if(obj.isMouseOver(mouseX, mouseY)) {
-		    			System.out.println("You clicked " + obj.getText());
-			    		if(obj.getText().equals("Controls:")) {
-			    			textObjects.get(4).toggleVis();
-			    			textObjects.get(5).toggleVis();
-			    			textObjects.get(6).toggleVis();
-			    			textObjects.get(7).toggleVis();
-			    			textObjects.get(8).toggleVis();
-			    			textObjects.get(9).toggleVis();
+		    			if(obj.getText().equals("Appearance \21")) {
+			    			for(int i = 6; i < 10; i++) {
+			    				textObjects.get(i).toggleVis();	
+			    			}
+			    			textObjects.get(3).moveDown(4);
+			    			textObjects.get(4).moveDown(4);
+			    			textObjects.get(5).moveDown(4);
+			    			for(int i = 10; i<textObjects.size(); i++) {
+			    				textObjects.get(i).moveDown(4);
+			    			}
+			    			obj.setText("Appearance \20");
+			    		}else if(obj.getText().equals("Appearance \20")) {
+			    			for(int i = 6; i < 10; i++) {
+			    				textObjects.get(i).toggleVis();	
+			    			}
+			    			textObjects.get(3).moveDown(-4);
+			    			textObjects.get(4).moveDown(-4);
+			    			textObjects.get(5).moveDown(-4);
+			    			for(int i = 10; i<textObjects.size(); i++) {
+			    				textObjects.get(i).moveDown(-4);
+			    			}
+			    			obj.setText("Appearance \21");
+			    		}
+		    			if(obj.getText().equals("View \21")) {
+		    				for(int i = 10; i < 12; i++) {
+			    				textObjects.get(i).toggleVis();	
+			    			}
+			    			textObjects.get(4).moveDown(2);
+			    			textObjects.get(5).moveDown(2);
+			    			for(int i = 12; i<textObjects.size(); i++) {
+			    				textObjects.get(i).moveDown(2);
+			    			}
+			    			obj.setText("View \20");
+			    		}
+		    			else if(obj.getText().equals("View \20")) {
+			    			for(int i = 10; i < 12; i++) {
+			    				textObjects.get(i).toggleVis();	
+			    			}
+			    			textObjects.get(4).moveDown(-2);
+			    			textObjects.get(5).moveDown(-2);
+			    			for(int i = 12; i<textObjects.size(); i++) {
+			    				textObjects.get(i).moveDown(-2);
+			    			}
+			    			obj.setText("View \21");
+			    		}
+		    			if(obj.getText().equals("Performance \21")) {
+		    				for(int i = 12; i < 15; i++) {
+			    				textObjects.get(i).toggleVis();	
+			    			}
+			    			textObjects.get(5).moveDown(3);
+			    			for(int i = 15; i<textObjects.size(); i++) {
+			    				textObjects.get(i).moveDown(3);
+			    			}
+			    			obj.setText("Performance \20");
+			    		}
+		    			else if(obj.getText().equals("Performance \20")) {
+			    			for(int i = 12; i < 15; i++) {
+			    				textObjects.get(i).toggleVis();	
+			    			}
+			    			textObjects.get(5).moveDown(-3);
+			    			for(int i = 15; i<textObjects.size(); i++) {
+			    				textObjects.get(i).moveDown(-3);
+			    			}
+			    			obj.setText("Performance \21");
+			    		}
+			    		if(obj.getText().equals("Controls \21")) {
+			    			for(int i = 15; i < 20; i++) {
+			    				textObjects.get(i).toggleVis();
+			    			}
+			    			obj.setText("Controls \20");
+			    		}else if(obj.getText().equals("Controls \20")) {
+			    			for(int i = 15; i < 20; i++) {
+			    				textObjects.get(i).toggleVis();
+			    			}
+			    			obj.setText("Controls \21");
 			    		}
 		    		}
 		    	}

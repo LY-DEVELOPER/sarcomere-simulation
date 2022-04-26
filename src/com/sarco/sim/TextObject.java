@@ -123,13 +123,15 @@ public class TextObject extends Object {
 	}
 	
 	public void toggleVis() {
-		if(this.colour.w > 0) {
-			this.colour.w = 0;
+		if(this.getPosition().x > 0) {
+			this.movePosition(-1000, 0, 0);
 		}else {
-			this.colour.w = 1;
+			this.movePosition(1000, 0, 0);
 		}
-		
-		setText(this.getText());
+	}
+	
+	public void moveDown(float amount) {
+		this.movePosition(0, amount * 35, 0);
 	}
 	
 	public boolean isMouseOver(double x, double y) {
