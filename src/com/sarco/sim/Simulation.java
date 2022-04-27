@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class Simulation implements Runnable {
 
@@ -49,6 +50,9 @@ public class Simulation implements Runnable {
 	boolean moveActin;
 	boolean actinReturn = false;
 	int speed = 8;
+	boolean vsync = true;
+	int fps = 100;
+	int liveFPS;
 
 	private Map<Mesh, List<Object>> meshMap;
 	private Map<Mesh, List<TextObject>> textMeshMap;
@@ -60,7 +64,7 @@ public class Simulation implements Runnable {
 	private static final float Z_FAR = 1000.f;
 
 	float i = 0.1f;
-	
+
 	double mouseX;
 	double mouseY;
 	boolean mouseHold;
@@ -86,7 +90,7 @@ public class Simulation implements Runnable {
 		window = new Window();
 		timer = new Timer();
 		transformation = new Transformations();
-		window.init();
+		window.init(vsync);
 		shader = new ShaderProgram();
 		camera = new Camera();
 		meshMap = new HashMap<Mesh, List<Object>>();
@@ -121,63 +125,80 @@ public class Simulation implements Runnable {
 
 		textObjects.add(new TextObject("AutoPlay:Off", font, 16, 16));
 		textObjects.get(0).setPosition(10f, 5f, 1);
+		textObjects.add(new TextObject("FPS:" + liveFPS, font, 16, 16));
+		textObjects.get(1).setPosition(window.getWidth() - 190f, window.getHeight() - 40f, 1);
 		textObjects.add(new TextObject("Contracting:Off", font, 16, 16));
-		textObjects.get(1).setPosition(window.getWidth() - 300f, 5f, 1);
+		textObjects.get(2).setPosition(window.getWidth() - 300f, 5f, 1);
 		textObjects.add(new TextObject("Appearance \21", font, 16, 16));
-		textObjects.get(2).setPosition(10f, 35 + 5, 1);
+		textObjects.get(3).setPosition(10f, 35 + 5, 1);
 		textObjects.add(new TextObject("View \21", font, 16, 16));
-		textObjects.get(3).setPosition(10f, 35 * 2 + 5, 1);
+		textObjects.get(4).setPosition(10f, 35 * 2 + 5, 1);
 		textObjects.add(new TextObject("Performance \21", font, 16, 16));
-		textObjects.get(4).setPosition(10f, 35 * 3 + 5, 1);
+		textObjects.get(5).setPosition(10f, 35 * 3 + 5, 1);
 		textObjects.add(new TextObject("Controls \21", font, 16, 16));
-		textObjects.get(5).setPosition(10f, 35 * 4 + 5, 1);
+		textObjects.get(6).setPosition(10f, 35 * 4 + 5, 1);
 		textObjects.add(new TextObject("Myosin Colour", font, 16, 16));
-		textObjects.get(6).setPosition(20f, 35 * 2 + 5, 1);
+		textObjects.get(7).setPosition(20f, 35 * 2 + 5, 1);
 		textObjects.add(new TextObject("Myosin Transparency", font, 16, 16));
-		textObjects.get(7).setPosition(20f, 35 * 3 + 5, 1);
+		textObjects.get(8).setPosition(20f, 35 * 3 + 5, 1);
 		textObjects.add(new TextObject("Actin Colour", font, 16, 16));
-		textObjects.get(8).setPosition(20f, 35 * 4 + 5, 1);
+		textObjects.get(9).setPosition(20f, 35 * 4 + 5, 1);
 		textObjects.add(new TextObject("Actin Transparency", font, 16, 16));
-		textObjects.get(9).setPosition(20f, 35 * 5 + 5, 1);
+		textObjects.get(10).setPosition(20f, 35 * 5 + 5, 1);
 		textObjects.add(new TextObject("Re-Centre Camera", font, 16, 16));
-		textObjects.get(10).setPosition(20f, 35 * 3 + 5, 1);
+		textObjects.get(11).setPosition(20f, 35 * 3 + 5, 1);
 		textObjects.add(new TextObject("Speed:" + speed + "/64", font, 16, 16));
-		textObjects.get(11).setPosition(20f, 35 * 4 + 5, 1);
-		textObjects.add(new TextObject("Quality: Low", font, 16, 16));
 		textObjects.get(12).setPosition(20f, 35 * 4 + 5, 1);
-		textObjects.add(new TextObject("V-sync: On", font, 16, 16));
-		textObjects.get(13).setPosition(20f, 35 * 5 + 5, 1);
-		textObjects.add(new TextObject("FPS: 60", font, 16, 16));
-		textObjects.get(14).setPosition(20f, 35 * 6 + 5, 1);
-		textObjects.add(new TextObject("Arrow Keys: Rotate Camera", font, 16, 16));
-		textObjects.get(15).setPosition(20f, 35 * 5 + 5, 1);
+		textObjects.add(new TextObject("Quality: Low", font, 16, 16));
+		textObjects.get(13).setPosition(20f, 35 * 4 + 5, 1);
+		textObjects.add(new TextObject("V-sync: " + vsync, font, 16, 16));
+		textObjects.get(14).setPosition(20f, 35 * 5 + 5, 1);
+		textObjects.add(new TextObject("FPS: " + fps, font, 16, 16));
+		textObjects.get(15).setPosition(20f, 35 * 6 + 5, 1);
+		textObjects.add(new TextObject("Arrow Keys: Move Camera", font, 16, 16));
+		textObjects.get(16).setPosition(20f, 35 * 5 + 5, 1);
+		textObjects.add(new TextObject("Click + Drag: Rotate Camera", font, 16, 16));
+		textObjects.get(17).setPosition(20f, 35 * 6 + 5, 1);
 		textObjects.add(new TextObject("Scroll: Zoom", font, 16, 16));
-		textObjects.get(16).setPosition(20f, 35 * 6 + 5, 1);
+		textObjects.get(18).setPosition(20f, 35 * 7 + 5, 1);
 		textObjects.add(new TextObject("C: Center Camera", font, 16, 16));
-		textObjects.get(17).setPosition(20f, 35 * 7 + 5, 1);
+		textObjects.get(19).setPosition(20f, 35 * 8 + 5, 1);
 		textObjects.add(new TextObject("V/B: Speed Down/Up", font, 16, 16));
-		textObjects.get(18).setPosition(20f, 35 * 8 + 5, 1);
+		textObjects.get(20).setPosition(20f, 35 * 9 + 5, 1);
 		textObjects.add(new TextObject("A: Toggle AutoPlay", font, 16, 16));
-		textObjects.get(19).setPosition(20f, 35 * 9 + 5, 1);
+		textObjects.get(21).setPosition(20f, 35 * 10 + 5, 1);
 		textObjects.add(new TextObject("Space Bar: Contract", font, 16, 16));
-		textObjects.get(20).setPosition(20f, 35 * 10 + 5, 1);
-		for(TextObject obj : textObjects) {
+		textObjects.get(22).setPosition(20f, 35 * 11 + 5, 1);
+		for (TextObject obj : textObjects) {
 			obj.setScale(0.3f);
 		}
-		for(int i = 6; i < textObjects.size(); i++) {
-			textObjects.get(i).toggleVis();	
+		for (int i = 7; i < textObjects.size(); i++) {
+			textObjects.get(i).toggleVis();
 		}
-		glViewport(0,0,window.getWidth(),window.getHeight());
+		glViewport(0, 0, window.getWidth(), window.getHeight());
 	}
 
 	public void simLoop() throws Exception {
 		boolean running = true;
 		float delta;
+		ArrayList<Integer> averageFPS = new ArrayList<Integer>();
 		while (running && !window.shouldClose()) {
 			delta = timer.getDelta();
+			averageFPS.add(Math.round(1 / delta));
+			if(averageFPS.size() == fps / 2) {
+				int total = 0;
+				for(Integer i : averageFPS) {
+					total += i;
+				}
+				liveFPS = total / fps * 2;
+				averageFPS = new ArrayList<Integer>();
+			}
 			update(delta);
 			render();
-			window.update();
+			window.update(vsync);
+			if (!vsync) {
+				Thread.sleep(Math.round(Math.ceil((float) 1 / (fps + (0.5 * fps)) * 1000)));
+			}
 		}
 	}
 
@@ -231,14 +252,15 @@ public class Simulation implements Runnable {
 		} else {
 			textObjects.get(0).setText("AutoPlay:Off");
 		}
-
+			textObjects.get(1).setText("FPS: " + liveFPS);
+			textObjects.get(14).setText("vsync: " + vsync);
 		if (contract) {
-			textObjects.get(1).setText("Contracting:On");
+			textObjects.get(2).setText("Contracting:On");
 		} else {
-			textObjects.get(1).setText("Contracting:Off");
+			textObjects.get(2).setText("Contracting:Off");
 		}
 
-		textObjects.get(11).setText("Speed:" + speed + "/64");
+		textObjects.get(12).setText("Speed:" + speed + "/64");
 	}
 
 	public void moveActin() {
@@ -249,14 +271,15 @@ public class Simulation implements Runnable {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
 		if (window.isResized()) {
-			glViewport(0,0,window.getWidth(),window.getHeight());
+			textObjects.get(1).setPosition(window.getWidth() - 190f, window.getHeight() - 40f, 1);
+			textObjects.get(2).setPosition(window.getWidth() - 300f, 5f, 1);
+			glViewport(0, 0, window.getWidth(), window.getHeight());
 			window.setResized(false);
 		}
 		shader.bind();
 		// Update projection Matrix
-		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV,
-				window.getWidth(),
-				window.getHeight(), Z_NEAR, Z_FAR);
+		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
+				Z_NEAR, Z_FAR);
 		shader.setUniform("projectionMatrix", projectionMatrix);
 
 		shader.setUniform("texture_sampler", 0);
@@ -322,10 +345,16 @@ public class Simulation implements Runnable {
 				glfwSetWindowShouldClose(window, true);
 			}
 			if (key == GLFW_KEY_RIGHT && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-				objects.forEach((object) -> {if(object.getRotation().y == 180) {object.movePosition(1f, 0, 0);}else{object.movePosition(-1f, 0, 0);}});
+				camera.movePosition(0.1f, 0, 0);
 			}
 			if (key == GLFW_KEY_LEFT && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-				objects.forEach((object) -> {if(object.getRotation().y == 180) {object.movePosition(-1f, 0, 0);}else{object.movePosition(1f, 0, 0);}});
+				camera.movePosition(-0.1f, 0, 0);
+			}
+			if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
+				camera.movePosition(0, 0.1f, 0);
+			}
+			if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
+				camera.movePosition(0, -0.1f, 0);
 			}
 			if (key == GLFW_KEY_C && action == GLFW_PRESS) {
 				camera.setRotation(0, 0, 0);
@@ -363,103 +392,116 @@ public class Simulation implements Runnable {
 			}
 		}
 	};
-	
+
 	private GLFWMouseButtonCallback mouseCallback = new GLFWMouseButtonCallback() {
 		@Override
 		public void invoke(long window, int button, int action, int mods) {
 			// TODO Auto-generated method stub
 			if (button == GLFW_MOUSE_BUTTON_LEFT && GLFW_PRESS == action) {
-		            mouseHold = true;
-		            lastX = mouseX;
-			    	lastY = mouseY;
-		    }
-			if (button == GLFW_MOUSE_BUTTON_LEFT && GLFW_RELEASE == action) {
-	            mouseHold = false;
-		    	lastX = mouseX;
-		    	lastY = mouseY;
+				mouseHold = true;
+				lastX = mouseX;
+				lastY = mouseY;
 			}
-		    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		    	for(TextObject obj : textObjects) {
-		    		if(obj.isMouseOver(mouseX, mouseY)) {
-		    			if(obj.getText().equals("Appearance \21")) {
-			    			for(int i = 6; i < 10; i++) {
-			    				textObjects.get(i).toggleVis();	
-			    			}
-			    			textObjects.get(3).moveDown(4);
-			    			textObjects.get(4).moveDown(4);
-			    			textObjects.get(5).moveDown(4);
-			    			for(int i = 10; i<textObjects.size(); i++) {
-			    				textObjects.get(i).moveDown(4);
-			    			}
-			    			obj.setText("Appearance \20");
-			    		}else if(obj.getText().equals("Appearance \20")) {
-			    			for(int i = 6; i < 10; i++) {
-			    				textObjects.get(i).toggleVis();	
-			    			}
-			    			textObjects.get(3).moveDown(-4);
-			    			textObjects.get(4).moveDown(-4);
-			    			textObjects.get(5).moveDown(-4);
-			    			for(int i = 10; i<textObjects.size(); i++) {
-			    				textObjects.get(i).moveDown(-4);
-			    			}
-			    			obj.setText("Appearance \21");
-			    		}
-		    			if(obj.getText().equals("View \21")) {
-		    				for(int i = 10; i < 12; i++) {
-			    				textObjects.get(i).toggleVis();	
-			    			}
-			    			textObjects.get(4).moveDown(2);
-			    			textObjects.get(5).moveDown(2);
-			    			for(int i = 12; i<textObjects.size(); i++) {
-			    				textObjects.get(i).moveDown(2);
-			    			}
-			    			obj.setText("View \20");
-			    		}
-		    			else if(obj.getText().equals("View \20")) {
-			    			for(int i = 10; i < 12; i++) {
-			    				textObjects.get(i).toggleVis();	
-			    			}
-			    			textObjects.get(4).moveDown(-2);
-			    			textObjects.get(5).moveDown(-2);
-			    			for(int i = 12; i<textObjects.size(); i++) {
-			    				textObjects.get(i).moveDown(-2);
-			    			}
-			    			obj.setText("View \21");
-			    		}
-		    			if(obj.getText().equals("Performance \21")) {
-		    				for(int i = 12; i < 15; i++) {
-			    				textObjects.get(i).toggleVis();	
-			    			}
-			    			textObjects.get(5).moveDown(3);
-			    			for(int i = 15; i<textObjects.size(); i++) {
-			    				textObjects.get(i).moveDown(3);
-			    			}
-			    			obj.setText("Performance \20");
-			    		}
-		    			else if(obj.getText().equals("Performance \20")) {
-			    			for(int i = 12; i < 15; i++) {
-			    				textObjects.get(i).toggleVis();	
-			    			}
-			    			textObjects.get(5).moveDown(-3);
-			    			for(int i = 15; i<textObjects.size(); i++) {
-			    				textObjects.get(i).moveDown(-3);
-			    			}
-			    			obj.setText("Performance \21");
-			    		}
-			    		if(obj.getText().equals("Controls \21")) {
-			    			for(int i = 15; i < 20; i++) {
-			    				textObjects.get(i).toggleVis();
-			    			}
-			    			obj.setText("Controls \20");
-			    		}else if(obj.getText().equals("Controls \20")) {
-			    			for(int i = 15; i < 20; i++) {
-			    				textObjects.get(i).toggleVis();
-			    			}
-			    			obj.setText("Controls \21");
-			    		}
-		    		}
-		    	}
-		    }
+			if (button == GLFW_MOUSE_BUTTON_LEFT && GLFW_RELEASE == action) {
+				mouseHold = false;
+				lastX = mouseX;
+				lastY = mouseY;
+			}
+			if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+				for (TextObject obj : textObjects) {
+					if (obj.isMouseOver(mouseX, mouseY)) {
+						mouseHold = false;
+						if (obj.getText().equals("AutoPlay:Off") || obj.getText().equals("AutoPlay:On")) {
+							autoPlay = !autoPlay;
+							contract = true;
+							if (actinReturn) {
+								actinReturn = false;
+							}
+							if (!autoPlay) {
+								actinReturn = true;
+								contract = false;
+							}
+						}
+						if (obj.getText().equals("vsync: false") || obj.getText().equals("vsync: true")) {
+							vsync = !vsync;
+						}
+						if (obj.getText().equals("Appearance \21")) {
+							for (int i = 7; i < 11; i++) {
+								textObjects.get(i).toggleVis();
+							}
+							textObjects.get(4).moveDown(4);
+							textObjects.get(5).moveDown(4);
+							textObjects.get(6).moveDown(4);
+							for (int i = 11; i < textObjects.size(); i++) {
+								textObjects.get(i).moveDown(4);
+							}
+							obj.setText("Appearance \20");
+						} else if (obj.getText().equals("Appearance \20")) {
+							for (int i = 7; i < 11; i++) {
+								textObjects.get(i).toggleVis();
+							}
+							textObjects.get(4).moveDown(-4);
+							textObjects.get(5).moveDown(-4);
+							textObjects.get(6).moveDown(-4);
+							for (int i = 11; i < textObjects.size(); i++) {
+								textObjects.get(i).moveDown(-4);
+							}
+							obj.setText("Appearance \21");
+						}
+						if (obj.getText().equals("View \21")) {
+							for (int i = 11; i < 13; i++) {
+								textObjects.get(i).toggleVis();
+							}
+							textObjects.get(5).moveDown(2);
+							textObjects.get(6).moveDown(2);
+							for (int i = 13; i < textObjects.size(); i++) {
+								textObjects.get(i).moveDown(2);
+							}
+							obj.setText("View \20");
+						} else if (obj.getText().equals("View \20")) {
+							for (int i = 11; i < 13; i++) {
+								textObjects.get(i).toggleVis();
+							}
+							textObjects.get(5).moveDown(-2);
+							textObjects.get(6).moveDown(-2);
+							for (int i = 13; i < textObjects.size(); i++) {
+								textObjects.get(i).moveDown(-2);
+							}
+							obj.setText("View \21");
+						}
+						if (obj.getText().equals("Performance \21")) {
+							for (int i = 13; i < 16; i++) {
+								textObjects.get(i).toggleVis();
+							}
+							textObjects.get(6).moveDown(3);
+							for (int i = 16; i < textObjects.size(); i++) {
+								textObjects.get(i).moveDown(3);
+							}
+							obj.setText("Performance \20");
+						} else if (obj.getText().equals("Performance \20")) {
+							for (int i = 13; i < 16; i++) {
+								textObjects.get(i).toggleVis();
+							}
+							textObjects.get(6).moveDown(-3);
+							for (int i = 16; i < textObjects.size(); i++) {
+								textObjects.get(i).moveDown(-3);
+							}
+							obj.setText("Performance \21");
+						}
+						if (obj.getText().equals("Controls \21")) {
+							for (int i = 16; i < 22; i++) {
+								textObjects.get(i).toggleVis();
+							}
+							obj.setText("Controls \20");
+						} else if (obj.getText().equals("Controls \20")) {
+							for (int i = 16; i < 22; i++) {
+								textObjects.get(i).toggleVis();
+							}
+							obj.setText("Controls \21");
+						}
+					}
+				}
+			}
 		}
 	};
 
@@ -468,7 +510,7 @@ public class Simulation implements Runnable {
 		@Override
 		public void invoke(long window, double xoffset, double yoffset) {
 			// TODO Auto-generated method stub
-			camera.camZoom((float) yoffset / 10);
+			camera.camZoom((float) yoffset / 5);
 		}
 	};
 	private GLFWCursorPosCallback cursorCallback = new GLFWCursorPosCallback() {
@@ -484,13 +526,13 @@ public class Simulation implements Runnable {
 			float mouseMoveY = ((float) lastX - (float) mouseX);
 			mouseMoveY *= -1;
 			mouseMoveY *= 0.5f;
-		    if(mouseHold) {
-		    	camera.moveRotation(mouseMoveX , mouseMoveY, 0);
-		    	lastX = mouseX;
-		    	lastY = mouseY;
-		    }
+			if (mouseHold) {
+				camera.moveRotation(mouseMoveX, mouseMoveY, 0);
+				lastX = mouseX;
+				lastY = mouseY;
+			}
 		}
-		
+
 	};
 
 }

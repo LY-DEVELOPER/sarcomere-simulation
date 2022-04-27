@@ -32,15 +32,15 @@ public class CreateSceneObjects {
 		objects.add(new Object(length));
 		objects.get(2).setPosition(0, 1, 0);
 		objects.add(new Object(actin));
-		objects.get(3).setPosition(5, 0.4f, 0);
+		objects.get(3).setPosition(5, 0.38f, 0);
 		objects.add(new Object(actin));
-		objects.get(4).setPosition(5, -0.4f, 0);
+		objects.get(4).setPosition(5, -0.38f, 0);
 		objects.add(new Object(actin));
 		objects.get(5).setRotation(0, 180, 0);
-		objects.get(5).setPosition(-5, 0.4f, 0);
+		objects.get(5).setPosition(-5, 0.38f, 0);
 		objects.add(new Object(actin));
 		objects.get(6).setRotation(0, 180, 0);
-		objects.get(6).setPosition(-5, -0.4f, 0);
+		objects.get(6).setPosition(-5, -0.38f, 0);
 		for (int i = 0; i < 45; i++) {
 			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
 			myosinObj.setRotation(118.8f + i * 36, 0, 0);

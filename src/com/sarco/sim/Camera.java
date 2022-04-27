@@ -68,11 +68,13 @@ public class Camera {
 	}
 
 	public void camZoom(float zoom) {
-		this.scale += zoom;
-		if (scale > 10f) {
-			scale = 10f;
-		} else if (scale < 0.11f) {
-			scale = 0.11f;
+		zoom *= -1;
+		zoom *= position.z;
+		this.position.z += zoom;
+		if (position.z > 5f) {
+			position.z = 5f;
+		} else if (position.z < 0.1f) {
+			position.z = 0.1f;
 		}
 	}
 }

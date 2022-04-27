@@ -41,7 +41,7 @@ public class Window {
 
 	boolean resized = false;
 
-	public void init() {
+	public void init(boolean vysnc) {
 		// TODO Auto-generated method stub
 		glfwSetErrorCallback(errorCallback);
 		if (!glfwInit()) {
@@ -73,15 +73,18 @@ public class Window {
 		glfwSetWindowPos(window, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
 
 		glfwMakeContextCurrent(window);
-		glfwSwapInterval(1);
+		if (vysnc) {
+			glfwSwapInterval(1);
+		}
 		glfwShowWindow(window);
 		GL.createCapabilities();
-		
-		GLFWImage image = GLFWImage.malloc(); GLFWImage.Buffer imagebf = GLFWImage.malloc(1);
-        try {
+
+		GLFWImage image = GLFWImage.malloc();
+		GLFWImage.Buffer imagebf = GLFWImage.malloc(1);
+		try {
 			image.set(50, 50, loadImage("./textures/icon.png"));
-	        imagebf.put(0, image);
-	        glfwSetWindowIcon(window, imagebf);
+			imagebf.put(0, image);
+			glfwSetWindowIcon(window, imagebf);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -97,7 +100,12 @@ public class Window {
 		glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
 	}
 
-	public void update() {
+	public void update(boolean vysnc) {
+		if (vysnc) {
+			glfwSwapInterval(1);
+		} else {
+			glfwSwapInterval(0);
+		}
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
