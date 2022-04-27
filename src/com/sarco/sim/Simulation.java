@@ -3,6 +3,7 @@ package com.sarco.sim;
 import static org.lwjgl.glfw.GLFW.*;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -73,6 +74,7 @@ public class Simulation implements Runnable {
 
 	ArrayList<Object> objects;
 	ArrayList<TextObject> textObjects;
+	ArrayList<Slider> sliderObjects;
 
 	@Override
 	public void run() {
@@ -120,6 +122,7 @@ public class Simulation implements Runnable {
 		objects = CreateSceneObjects.gen();
 
 		textObjects = new ArrayList<TextObject>();
+		sliderObjects = new ArrayList<Slider>();
 
 		String font = "./textures/font.png";
 
@@ -130,51 +133,65 @@ public class Simulation implements Runnable {
 		textObjects.add(new TextObject("Contracting:Off", font, 16, 16));
 		textObjects.get(2).setPosition(window.getWidth() - 300f, 5f, 1);
 		textObjects.add(new TextObject("Appearance \21", font, 16, 16));
-		textObjects.get(3).setPosition(10f, 35 + 5, 1);
+		textObjects.get(3).setPosition(10f, 30 + 5, 1);
 		textObjects.add(new TextObject("View \21", font, 16, 16));
-		textObjects.get(4).setPosition(10f, 35 * 2 + 5, 1);
+		textObjects.get(4).setPosition(10f, 30 * 2 + 5, 1);
 		textObjects.add(new TextObject("Performance \21", font, 16, 16));
-		textObjects.get(5).setPosition(10f, 35 * 3 + 5, 1);
+		textObjects.get(5).setPosition(10f, 30 * 3 + 5, 1);
 		textObjects.add(new TextObject("Controls \21", font, 16, 16));
-		textObjects.get(6).setPosition(10f, 35 * 4 + 5, 1);
+		textObjects.get(6).setPosition(10f, 30 * 4 + 5, 1);
+
 		textObjects.add(new TextObject("Myosin Colour", font, 16, 16));
-		textObjects.get(7).setPosition(20f, 35 * 2 + 5, 1);
+		textObjects.get(7).setPosition(20f, 30 * 2 + 5, 1);
+		sliderObjects.add(new Slider("mColour", new Vector3f(0, 30 * 3 + 5, 1)));
 		textObjects.add(new TextObject("Myosin Transparency", font, 16, 16));
-		textObjects.get(8).setPosition(20f, 35 * 3 + 5, 1);
+		textObjects.get(8).setPosition(20f, 30 * 4 + 5, 1);
+		sliderObjects.add(new Slider("mTran", new Vector3f(0, 30 * 5 + 5, 1), 100));
 		textObjects.add(new TextObject("Actin Colour", font, 16, 16));
-		textObjects.get(9).setPosition(20f, 35 * 4 + 5, 1);
+		textObjects.get(9).setPosition(20f, 30 * 6 + 5, 1);
+		sliderObjects.add(new Slider("aColour", new Vector3f(0, 30 * 7 + 5, 1)));
 		textObjects.add(new TextObject("Actin Transparency", font, 16, 16));
-		textObjects.get(10).setPosition(20f, 35 * 5 + 5, 1);
+		textObjects.get(10).setPosition(20f, 30 * 8 + 5, 1);
+		sliderObjects.add(new Slider("aTran", new Vector3f(0, 30 * 9 + 5, 1), 100));
+
 		textObjects.add(new TextObject("Re-Centre Camera", font, 16, 16));
-		textObjects.get(11).setPosition(20f, 35 * 3 + 5, 1);
+		textObjects.get(11).setPosition(20f, 30 * 3 + 5, 1);
 		textObjects.add(new TextObject("Speed:" + speed + "/64", font, 16, 16));
-		textObjects.get(12).setPosition(20f, 35 * 4 + 5, 1);
+		textObjects.get(12).setPosition(20f, 30 * 4 + 5, 1);
+		sliderObjects.add(new Slider("speed", new Vector3f(0, 30 * 5 + 5, 1), (float) (speed / 0.64)));
+
 		textObjects.add(new TextObject("Quality: Low", font, 16, 16));
-		textObjects.get(13).setPosition(20f, 35 * 4 + 5, 1);
+		textObjects.get(13).setPosition(20f, 30 * 4 + 5, 1);
 		textObjects.add(new TextObject("V-sync: " + vsync, font, 16, 16));
-		textObjects.get(14).setPosition(20f, 35 * 5 + 5, 1);
+		textObjects.get(14).setPosition(20f, 30 * 5 + 5, 1);
 		textObjects.add(new TextObject("FPS: " + fps, font, 16, 16));
-		textObjects.get(15).setPosition(20f, 35 * 6 + 5, 1);
+		textObjects.get(15).setPosition(20f, 30 * 6 + 5, 1);
+		sliderObjects.add(new Slider("fps", new Vector3f(0, 30 * 7 + 5, 1), fps / 2));
+
 		textObjects.add(new TextObject("Arrow Keys: Move Camera", font, 16, 16));
-		textObjects.get(16).setPosition(20f, 35 * 5 + 5, 1);
+		textObjects.get(16).setPosition(20f, 30 * 5 + 5, 1);
 		textObjects.add(new TextObject("Click + Drag: Rotate Camera", font, 16, 16));
-		textObjects.get(17).setPosition(20f, 35 * 6 + 5, 1);
+		textObjects.get(17).setPosition(20f, 30 * 6 + 5, 1);
 		textObjects.add(new TextObject("Scroll: Zoom", font, 16, 16));
-		textObjects.get(18).setPosition(20f, 35 * 7 + 5, 1);
+		textObjects.get(18).setPosition(20f, 30 * 7 + 5, 1);
 		textObjects.add(new TextObject("C: Center Camera", font, 16, 16));
-		textObjects.get(19).setPosition(20f, 35 * 8 + 5, 1);
+		textObjects.get(19).setPosition(20f, 30 * 8 + 5, 1);
 		textObjects.add(new TextObject("V/B: Speed Down/Up", font, 16, 16));
-		textObjects.get(20).setPosition(20f, 35 * 9 + 5, 1);
+		textObjects.get(20).setPosition(20f, 30 * 9 + 5, 1);
 		textObjects.add(new TextObject("A: Toggle AutoPlay", font, 16, 16));
-		textObjects.get(21).setPosition(20f, 35 * 10 + 5, 1);
+		textObjects.get(21).setPosition(20f, 30 * 10 + 5, 1);
 		textObjects.add(new TextObject("Space Bar: Contract", font, 16, 16));
-		textObjects.get(22).setPosition(20f, 35 * 11 + 5, 1);
+		textObjects.get(22).setPosition(20f, 30 * 11 + 5, 1);
+
 		for (TextObject obj : textObjects) {
 			obj.setScale(0.3f);
 		}
 		for (int i = 7; i < textObjects.size(); i++) {
 			textObjects.get(i).toggleVis();
 		}
+		sliderObjects.forEach((obj) -> {
+			obj.toggleVis();
+		});
 		glViewport(0, 0, window.getWidth(), window.getHeight());
 	}
 
@@ -185,15 +202,15 @@ public class Simulation implements Runnable {
 		while (running && !window.shouldClose()) {
 			delta = timer.getDelta();
 			averageFPS.add(Math.round(1 / delta));
-			if(averageFPS.size() == fps / 2) {
+			if (averageFPS.size() >= 200) {
 				int total = 0;
-				for(Integer i : averageFPS) {
+				for (Integer i : averageFPS) {
 					total += i;
 				}
-				liveFPS = total / fps * 2;
+				liveFPS = total / 200;
 				averageFPS = new ArrayList<Integer>();
 			}
-			update(delta);
+			update();
 			render();
 			window.update(vsync);
 			if (!vsync) {
@@ -202,7 +219,7 @@ public class Simulation implements Runnable {
 		}
 	}
 
-	public void update(float delta) {
+	public void update() {
 		moveActin = false;
 		if (objects.get(3).getPosition().x <= 0.3 && autoPlay) {
 			contract = false;
@@ -252,8 +269,8 @@ public class Simulation implements Runnable {
 		} else {
 			textObjects.get(0).setText("AutoPlay:Off");
 		}
-			textObjects.get(1).setText("FPS: " + liveFPS);
-			textObjects.get(14).setText("vsync: " + vsync);
+		textObjects.get(1).setText("FPS: " + liveFPS);
+		textObjects.get(14).setText("vsync: " + vsync);
 		if (contract) {
 			textObjects.get(2).setText("Contracting:On");
 		} else {
@@ -261,6 +278,24 @@ public class Simulation implements Runnable {
 		}
 
 		textObjects.get(12).setText("Speed:" + speed + "/64");
+		textObjects.get(15).setText("Target FPS:" + fps);
+
+		for (Object object : objects) {
+			if (object instanceof AnimObject) {
+				Vector3f i = valueToColour(sliderObjects.get(0).value);
+				int j = (int) sliderObjects.get(1).value;
+				object.getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
+			}
+		}
+		Vector3f i = valueToColour(sliderObjects.get(2).value);
+		int j = (int) sliderObjects.get(3).value;
+		objects.get(3).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
+		objects.get(4).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
+		objects.get(5).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
+		objects.get(6).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
+		
+		speed = (int)Math.round(sliderObjects.get(4).value * 0.64);
+		fps = (int)Math.round(sliderObjects.get(5).value * 2 + 20);
 	}
 
 	public void moveActin() {
@@ -314,7 +349,22 @@ public class Simulation implements Runnable {
 			Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(object, ortho);
 			hudShader.setUniform("projModelMatrix", projModelMatrix);
 			hudShader.setUniform("colour", object.getMesh().getColour());
-
+			// Render the mesh for this HUD item
+			mesh.render();
+		}
+		for (Slider slide : sliderObjects) {
+			Mesh mesh = slide.getPicker().getMesh();
+			// Set ortohtaphic and model matrix for this HUD item
+			Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(slide.getPicker(), ortho);
+			hudShader.setUniform("projModelMatrix", projModelMatrix);
+			hudShader.setUniform("colour", slide.getPicker().getMesh().getColour());
+			// Render the mesh for this HUD item
+			mesh.render();
+			mesh = slide.getBar().getMesh();
+			// Set ortohtaphic and model matrix for this HUD item
+			projModelMatrix = transformation.getOrtoProjModelMatrix(slide.getBar(), ortho);
+			hudShader.setUniform("projModelMatrix", projModelMatrix);
+			hudShader.setUniform("colour", slide.getBar().getMesh().getColour());
 			// Render the mesh for this HUD item
 			mesh.render();
 		}
@@ -380,16 +430,6 @@ public class Simulation implements Runnable {
 					contract = false;
 				}
 			}
-			if (key == GLFW_KEY_V && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-				if (speed > 1) {
-					speed--;
-				}
-			}
-			if (key == GLFW_KEY_B && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-				if (speed < 64) {
-					speed++;
-				}
-			}
 		}
 	};
 
@@ -408,6 +448,11 @@ public class Simulation implements Runnable {
 				lastY = mouseY;
 			}
 			if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+				for (Slider obj : sliderObjects) {
+					if (obj.getBar().isMouseOver(mouseX, mouseY)) {
+						obj.pickerClick((int) mouseX);
+					}
+				}
 				for (TextObject obj : textObjects) {
 					if (obj.isMouseOver(mouseX, mouseY)) {
 						mouseHold = false;
@@ -425,26 +470,43 @@ public class Simulation implements Runnable {
 						if (obj.getText().equals("vsync: false") || obj.getText().equals("vsync: true")) {
 							vsync = !vsync;
 						}
+						if (obj.getText().equals("Re-Centre Camera")) {
+							camera.setRotation(0, 0, 0);
+							camera.setPosition(0, 0, 3);
+							camera.setScale(0.2f);
+						}
 						if (obj.getText().equals("Appearance \21")) {
 							for (int i = 7; i < 11; i++) {
 								textObjects.get(i).toggleVis();
 							}
-							textObjects.get(4).moveDown(4);
-							textObjects.get(5).moveDown(4);
-							textObjects.get(6).moveDown(4);
+							for (int i = 0; i < 4; i++) {
+								sliderObjects.get(i).toggleVis();
+							}
+							textObjects.get(4).moveDown(8);
+							textObjects.get(5).moveDown(8);
+							textObjects.get(6).moveDown(8);
 							for (int i = 11; i < textObjects.size(); i++) {
-								textObjects.get(i).moveDown(4);
+								textObjects.get(i).moveDown(8);
+							}
+							for (int i = 4; i < sliderObjects.size(); i++) {
+								sliderObjects.get(i).moveDown(8);
 							}
 							obj.setText("Appearance \20");
 						} else if (obj.getText().equals("Appearance \20")) {
 							for (int i = 7; i < 11; i++) {
 								textObjects.get(i).toggleVis();
 							}
-							textObjects.get(4).moveDown(-4);
-							textObjects.get(5).moveDown(-4);
-							textObjects.get(6).moveDown(-4);
+							for (int i = 0; i < 4; i++) {
+								sliderObjects.get(i).toggleVis();
+							}
+							textObjects.get(4).moveDown(-8);
+							textObjects.get(5).moveDown(-8);
+							textObjects.get(6).moveDown(-8);
 							for (int i = 11; i < textObjects.size(); i++) {
-								textObjects.get(i).moveDown(-4);
+								textObjects.get(i).moveDown(-8);
+							}
+							for (int i = 4; i < sliderObjects.size(); i++) {
+								sliderObjects.get(i).moveDown(-8);
 							}
 							obj.setText("Appearance \21");
 						}
@@ -452,20 +514,28 @@ public class Simulation implements Runnable {
 							for (int i = 11; i < 13; i++) {
 								textObjects.get(i).toggleVis();
 							}
-							textObjects.get(5).moveDown(2);
-							textObjects.get(6).moveDown(2);
+							sliderObjects.get(4).toggleVis();
+							textObjects.get(5).moveDown(3);
+							textObjects.get(6).moveDown(3);
 							for (int i = 13; i < textObjects.size(); i++) {
-								textObjects.get(i).moveDown(2);
+								textObjects.get(i).moveDown(3);
+							}
+							for (int i = 5; i < sliderObjects.size(); i++) {
+								sliderObjects.get(i).moveDown(3);
 							}
 							obj.setText("View \20");
 						} else if (obj.getText().equals("View \20")) {
 							for (int i = 11; i < 13; i++) {
 								textObjects.get(i).toggleVis();
 							}
-							textObjects.get(5).moveDown(-2);
-							textObjects.get(6).moveDown(-2);
+							sliderObjects.get(4).toggleVis();
+							textObjects.get(5).moveDown(-3);
+							textObjects.get(6).moveDown(-3);
 							for (int i = 13; i < textObjects.size(); i++) {
-								textObjects.get(i).moveDown(-2);
+								textObjects.get(i).moveDown(-3);
+							}
+							for (int i = 5; i < sliderObjects.size(); i++) {
+								sliderObjects.get(i).moveDown(-3);
 							}
 							obj.setText("View \21");
 						}
@@ -473,28 +543,36 @@ public class Simulation implements Runnable {
 							for (int i = 13; i < 16; i++) {
 								textObjects.get(i).toggleVis();
 							}
-							textObjects.get(6).moveDown(3);
+							sliderObjects.get(5).toggleVis();
+							textObjects.get(6).moveDown(4);
 							for (int i = 16; i < textObjects.size(); i++) {
-								textObjects.get(i).moveDown(3);
+								textObjects.get(i).moveDown(4);
+							}
+							for (int i = 6; i < sliderObjects.size(); i++) {
+								sliderObjects.get(i).moveDown(4);
 							}
 							obj.setText("Performance \20");
 						} else if (obj.getText().equals("Performance \20")) {
 							for (int i = 13; i < 16; i++) {
 								textObjects.get(i).toggleVis();
 							}
-							textObjects.get(6).moveDown(-3);
+							sliderObjects.get(5).toggleVis();
+							textObjects.get(6).moveDown(-4);
 							for (int i = 16; i < textObjects.size(); i++) {
-								textObjects.get(i).moveDown(-3);
+								textObjects.get(i).moveDown(-4);
+							}
+							for (int i = 6; i < sliderObjects.size(); i++) {
+								sliderObjects.get(i).moveDown(-4);
 							}
 							obj.setText("Performance \21");
 						}
 						if (obj.getText().equals("Controls \21")) {
-							for (int i = 16; i < 22; i++) {
+							for (int i = 16; i < 23; i++) {
 								textObjects.get(i).toggleVis();
 							}
 							obj.setText("Controls \20");
 						} else if (obj.getText().equals("Controls \20")) {
-							for (int i = 16; i < 22; i++) {
+							for (int i = 16; i < 23; i++) {
 								textObjects.get(i).toggleVis();
 							}
 							obj.setText("Controls \21");
@@ -513,8 +591,39 @@ public class Simulation implements Runnable {
 			camera.camZoom((float) yoffset / 5);
 		}
 	};
-	private GLFWCursorPosCallback cursorCallback = new GLFWCursorPosCallback() {
 
+	public Vector3f valueToColour(float value) {
+		Vector3f col = new Vector3f(0, 0, 0);
+		if (value < (100 / 6)) {
+			col.z = 1;
+			col.y = ((100 / 6) - value) / 100 * 6;
+		}
+		if (value >= ((100 / 6)) && value < ((100 / 6) * 2)) {
+			col.x = (value - (100 / 6)) / 100 * 6;;
+			col.z = 1;
+		}
+		if (value >= ((100 / 6) * 2) && value < ((100 / 6) *3)) {
+			col.x = 1;
+			col.z = (((100 / 6) * 3) - value) / 100 * 6;
+		}
+		if (value >= ((100 / 6) * 3) && value < ((100 / 6) * 4)) {
+			col.y = (value - ((100 / 6) * 3)) / 100 * 6;
+			col.x = 1;
+		}
+		if (value >= ((100 / 6) * 4) && value < ((100 / 6) * 5)) {
+			col.y = 1;
+			col.x = (((100 / 6) * 5) - value) / 100 * 6;
+		}
+		if (value >= ((100 / 6) * 5)) {
+			col.z = (value - ((100 / 6) * 5)) / 100 * 6;
+			col.y = 1;
+		}
+
+		return col;
+	}
+
+	private GLFWCursorPosCallback cursorCallback = new GLFWCursorPosCallback() {
+		boolean mouseOnSlider = false;
 		@Override
 		public void invoke(long window, double xpos, double ypos) {
 			// TODO Auto-generated method stub
@@ -527,9 +636,19 @@ public class Simulation implements Runnable {
 			mouseMoveY *= -1;
 			mouseMoveY *= 0.5f;
 			if (mouseHold) {
-				camera.moveRotation(mouseMoveX, mouseMoveY, 0);
-				lastX = mouseX;
-				lastY = mouseY;
+				for (Slider obj : sliderObjects) {
+					if (obj.getBar().isMouseOver(mouseX, mouseY)) {
+						obj.pickerClick((int) mouseX);
+						mouseOnSlider = true;
+					}
+				}
+				if (!mouseOnSlider) {
+					camera.moveRotation(mouseMoveX, mouseMoveY, 0);
+					lastX = mouseX;
+					lastY = mouseY;
+				}
+			} else {
+				mouseOnSlider = false;
 			}
 		}
 

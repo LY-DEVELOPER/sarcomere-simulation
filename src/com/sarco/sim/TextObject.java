@@ -124,14 +124,14 @@ public class TextObject extends Object {
 	
 	public void toggleVis() {
 		if(this.getPosition().x > 0) {
-			this.movePosition(-1000, 0, 0);
+			this.movePosition(-10000, 0, 0);
 		}else {
-			this.movePosition(1000, 0, 0);
+			this.movePosition(10000, 0, 0);
 		}
 	}
 	
 	public void moveDown(float amount) {
-		this.movePosition(0, amount * 35, 0);
+		this.movePosition(0, amount * 30, 0);
 	}
 	
 	public boolean isMouseOver(double x, double y) {
