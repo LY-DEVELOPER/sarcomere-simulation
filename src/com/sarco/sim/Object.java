@@ -1,6 +1,7 @@
 package com.sarco.sim;
 
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 public class Object {
 
@@ -89,4 +90,20 @@ public class Object {
 	public void setMesh(Mesh mesh) {
 		this.meshes = new Mesh[] { mesh };
 	}
+    public void setR(float x) {
+    	Vector4f i = this.getMesh().getColour();
+    	this.getMesh().setColour(x, i.y, i.z, i.w);
+    }
+    public void setG(float y) {
+    	Vector4f i = this.getMesh().getColour();
+    	this.getMesh().setColour(i.x, y, i.z, i.w);
+    }
+    public void setB(float z) {
+    	Vector4f i = this.getMesh().getColour();
+    	this.getMesh().setColour(i.x, i.y, z, i.w);
+    }
+    public void setT(float w) {
+    	Vector4f i = this.getMesh().getColour();
+    	this.getMesh().setColour(i.x, i.y, i.z, w);
+    }
 }

@@ -20,6 +20,7 @@ public class CreateSceneObjects {
 		Mesh length = OBJLoader.loadMesh("/assets/length.obj");
 		length.setColour(0, 0.7f, 0.7f, 0.5f);
 		Mesh actin = OBJLoader.loadMesh("/assets/actin.obj");
+		actin.setTexture("./textures/texture.png");
 		actin.setColour(0, 0.58f, 1f, 1);
 		MD5Model myosin = MD5Model.parse("/assets/myosin.md5mesh");
 		MD5AnimModel animMyo = MD5AnimModel.parse("/assets/myosin.md5anim");

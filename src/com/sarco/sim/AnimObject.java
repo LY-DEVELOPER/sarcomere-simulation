@@ -3,6 +3,7 @@ package com.sarco.sim;
 import java.util.List;
 
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 
 public class AnimObject extends Object {
 	 private int currentFrame;
