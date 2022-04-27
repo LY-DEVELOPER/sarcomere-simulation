@@ -23,7 +23,7 @@ public class Mesh {
 
 	private final int vertexCount;
 	private Texture texture;
-	private Vector4f colour = new Vector4f(0.6f,0f,0f, 1);;
+	private Vector4f colour = new Vector4f(0.6f,0f,0f, 1);
 
 	public Mesh(float[] positions, float[] textCoords, float[] normals, int[] indices) {
 		this(positions, textCoords, normals, indices,

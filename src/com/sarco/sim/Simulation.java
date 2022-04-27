@@ -63,6 +63,9 @@ public class Simulation implements Runnable {
 	
 	double mouseX;
 	double mouseY;
+	boolean mouseHold;
+	double lastX;
+	double lastY;
 
 	ArrayList<Object> objects;
 	ArrayList<TextObject> textObjects;
@@ -318,17 +321,11 @@ public class Simulation implements Runnable {
 			if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 				glfwSetWindowShouldClose(window, true);
 			}
-			if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-				camera.moveRotation(2.5f, 0, 0);
-			}
-			if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-				camera.moveRotation(-2.5f, 0, 0);
-			}
 			if (key == GLFW_KEY_RIGHT && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-				camera.moveRotation(0, -2.5f, 0);
+				objects.forEach((object) -> {if(object.getRotation().y == 180) {object.movePosition(1f, 0, 0);}else{object.movePosition(-1f, 0, 0);}});
 			}
 			if (key == GLFW_KEY_LEFT && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-				camera.moveRotation(0, 2.5f, 0);
+				objects.forEach((object) -> {if(object.getRotation().y == 180) {object.movePosition(-1f, 0, 0);}else{object.movePosition(1f, 0, 0);}});
 			}
 			if (key == GLFW_KEY_C && action == GLFW_PRESS) {
 				camera.setRotation(0, 0, 0);
@@ -368,10 +365,19 @@ public class Simulation implements Runnable {
 	};
 	
 	private GLFWMouseButtonCallback mouseCallback = new GLFWMouseButtonCallback() {
-
 		@Override
 		public void invoke(long window, int button, int action, int mods) {
 			// TODO Auto-generated method stub
+			if (button == GLFW_MOUSE_BUTTON_LEFT && GLFW_PRESS == action) {
+		            mouseHold = true;
+		            lastX = mouseX;
+			    	lastY = mouseY;
+		    }
+			if (button == GLFW_MOUSE_BUTTON_LEFT && GLFW_RELEASE == action) {
+	            mouseHold = false;
+		    	lastX = mouseX;
+		    	lastY = mouseY;
+			}
 		    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		    	for(TextObject obj : textObjects) {
 		    		if(obj.isMouseOver(mouseX, mouseY)) {
@@ -472,6 +478,17 @@ public class Simulation implements Runnable {
 			// TODO Auto-generated method stub
 			mouseX = xpos;
 			mouseY = ypos;
+			float mouseMoveX = ((float) lastY - (float) mouseY);
+			mouseMoveX *= -1;
+			mouseMoveX *= 0.5f;
+			float mouseMoveY = ((float) lastX - (float) mouseX);
+			mouseMoveY *= -1;
+			mouseMoveY *= 0.5f;
+		    if(mouseHold) {
+		    	camera.moveRotation(mouseMoveX , mouseMoveY, 0);
+		    	lastX = mouseX;
+		    	lastY = mouseY;
+		    }
 		}
 		
 	};
