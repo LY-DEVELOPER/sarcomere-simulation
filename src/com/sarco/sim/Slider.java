@@ -44,7 +44,6 @@ public class Slider {
 			value = 100f;
 			picker.getPosition().x = bar.getPosition().x + 192 + (0.3f*64);
 		}
-		System.out.println(id + " value:" + value);
 	}
 	
 	public TextObject getBar() {

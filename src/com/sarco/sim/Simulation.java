@@ -47,12 +47,13 @@ public class Simulation implements Runnable {
 	Transformations transformation;
 
 	boolean contract = false;
-	boolean autoPlay = false;
+	boolean autoPlay = true;
 	boolean moveActin;
 	boolean actinReturn = false;
-	int speed = 8;
+	int speed = 10;
 	boolean vsync = true;
 	int fps = 100;
+	float step = 0;
 	int liveFPS;
 
 	private Map<Mesh, List<Object>> meshMap;
@@ -156,9 +157,9 @@ public class Simulation implements Runnable {
 
 		textObjects.add(new TextObject("Re-Centre Camera", font, 16, 16));
 		textObjects.get(11).setPosition(20f, 30 * 3 + 5, 1);
-		textObjects.add(new TextObject("Speed:" + speed + "/64", font, 16, 16));
+		textObjects.add(new TextObject("Speed:" + speed, font, 16, 16));
 		textObjects.get(12).setPosition(20f, 30 * 4 + 5, 1);
-		sliderObjects.add(new Slider("speed", new Vector3f(0, 30 * 5 + 5, 1), (float) (speed / 0.64)));
+		sliderObjects.add(new Slider("speed", new Vector3f(0, 30 * 5 + 5, 1), (float) (speed / 5)));
 
 		textObjects.add(new TextObject("Quality: Low", font, 16, 16));
 		textObjects.get(13).setPosition(20f, 30 * 4 + 5, 1);
@@ -210,7 +211,7 @@ public class Simulation implements Runnable {
 				liveFPS = total / 200;
 				averageFPS = new ArrayList<Integer>();
 			}
-			update();
+			update(delta);
 			render();
 			window.update(vsync);
 			if (!vsync) {
@@ -219,52 +220,59 @@ public class Simulation implements Runnable {
 		}
 	}
 
-	public void update() {
-		moveActin = false;
-		if (objects.get(3).getPosition().x <= 0.3 && autoPlay) {
-			contract = false;
-		}
-		if (objects.get(3).getPosition().x > 0.3 && !actinReturn && contract) {
-			objects.forEach((object) -> {
-				if (object instanceof AnimObject) {
-					((AnimObject) object).nextFrame(speed);
-					int frame = ((AnimObject) object).getCurrentFrameInt();
-					if (frame >= 32 && frame <= 64) {
-						moveActin();
+	public void update(float delta) {
+		step += delta / (float) (1 / (float) speed);
+		if (step >= 1) {
+			int stepInt = (int) Math.round(step);
+			moveActin = false;
+			if (objects.get(3).getPosition().x <= 0.3 && autoPlay) {
+				contract = false;
+			}
+			if (objects.get(3).getPosition().x > 0.3 && !actinReturn && contract) {
+				objects.forEach((object) -> {
+					if (object instanceof AnimObject) {
+						((AnimObject) object).nextFrame(stepInt);
+						int frame = ((AnimObject) object).getCurrentFrameInt();
+						if (frame >= 32 && frame <= 64) {
+							moveActin();
+						}
 					}
-				}
-			});
+				});
 
-			if (moveActin) {
-				float amount = (float) (0.13 / 32) * speed;
-				objects.get(3).movePosition(-amount, 0, 0);
-				objects.get(4).movePosition(-amount, 0, 0);
-				objects.get(5).movePosition(-amount, 0, 0);
-				objects.get(6).movePosition(-amount, 0, 0);
-			}
-		} else if (!actinReturn && !contract) {
-			objects.forEach((object) -> {
-				if (object instanceof AnimObject) {
-					((AnimObject) object).nextFrame(speed);
-					int frame = ((AnimObject) object).getCurrentFrameInt();
-					if (frame <= 16 || frame >= 80) {
-						actinReturn = true;
-					}
+				if (moveActin) {
+					float amount = (float) (0.13 / 32) * stepInt;
+					objects.get(3).movePosition(-amount, 0, 0);
+					objects.get(4).movePosition(-amount, 0, 0);
+					objects.get(5).movePosition(-amount, 0, 0);
+					objects.get(6).movePosition(-amount, 0, 0);
 				}
-			});
-		} else if (actinReturn || !contract) {
-			if (objects.get(3).getPosition().x < 5) {
-				float amount = (float) (0.13 / 32) * speed;
-				objects.get(3).movePosition(amount, 0, 0);
-				objects.get(4).movePosition(amount, 0, 0);
-				objects.get(5).movePosition(amount, 0, 0);
-				objects.get(6).movePosition(amount, 0, 0);
-			} else if (autoPlay) {
-				contract = true;
-				actinReturn = false;
+			} else if (!actinReturn && !contract) {
+				objects.forEach((object) -> {
+					if (object instanceof AnimObject) {
+						((AnimObject) object).nextFrame(stepInt);
+						int frame = ((AnimObject) object).getCurrentFrameInt();
+						if (frame <= 16 || frame >= 80) {
+							actinReturn = true;
+						}
+					}
+				});
+			} else if (actinReturn || !contract) {
+				if (objects.get(3).getPosition().x < 5) {
+					float amount = (float) (0.13 / 32) * stepInt;
+					objects.get(3).movePosition(amount, 0, 0);
+					objects.get(4).movePosition(amount, 0, 0);
+					objects.get(5).movePosition(amount, 0, 0);
+					objects.get(6).movePosition(amount, 0, 0);
+				} else if (autoPlay) {
+					contract = true;
+					actinReturn = false;
+				}
 			}
+			step = 0;
 		}
-		if (autoPlay) {
+		if (autoPlay)
+
+		{
 			textObjects.get(0).setText("AutoPlay:On");
 		} else {
 			textObjects.get(0).setText("AutoPlay:Off");
@@ -277,7 +285,7 @@ public class Simulation implements Runnable {
 			textObjects.get(2).setText("Contracting:Off");
 		}
 
-		textObjects.get(12).setText("Speed:" + speed + "/64");
+		textObjects.get(12).setText("Speed:" + speed);
 		textObjects.get(15).setText("Target FPS:" + fps);
 
 		for (Object object : objects) {
@@ -293,9 +301,9 @@ public class Simulation implements Runnable {
 		objects.get(4).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
 		objects.get(5).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
 		objects.get(6).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
-		
-		speed = (int)Math.round(sliderObjects.get(4).value * 0.64);
-		fps = (int)Math.round(sliderObjects.get(5).value * 2 + 20);
+
+		speed = (int) Math.round(sliderObjects.get(4).value * 5);
+		fps = (int) Math.round(sliderObjects.get(5).value * 2 + 20);
 	}
 
 	public void moveActin() {
@@ -599,10 +607,11 @@ public class Simulation implements Runnable {
 			col.y = ((100 / 6) - value) / 100 * 6;
 		}
 		if (value >= ((100 / 6)) && value < ((100 / 6) * 2)) {
-			col.x = (value - (100 / 6)) / 100 * 6;;
+			col.x = (value - (100 / 6)) / 100 * 6;
+			;
 			col.z = 1;
 		}
-		if (value >= ((100 / 6) * 2) && value < ((100 / 6) *3)) {
+		if (value >= ((100 / 6) * 2) && value < ((100 / 6) * 3)) {
 			col.x = 1;
 			col.z = (((100 / 6) * 3) - value) / 100 * 6;
 		}
@@ -624,6 +633,7 @@ public class Simulation implements Runnable {
 
 	private GLFWCursorPosCallback cursorCallback = new GLFWCursorPosCallback() {
 		boolean mouseOnSlider = false;
+
 		@Override
 		public void invoke(long window, double xpos, double ypos) {
 			// TODO Auto-generated method stub
