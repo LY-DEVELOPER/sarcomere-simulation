@@ -28,7 +28,7 @@ public class TextObject extends Object {
 		this.numCols = numCols;
 		this.numRows = numRows;
 		Texture texture = new Texture(fontFileName);
-		this.setMesh(buildMesh(texture, numCols, numRows));
+		this.setMeshes(new Mesh[] { buildMesh(texture, numCols, numRows)});
 	}
 
 	private Mesh buildMesh(Texture texture, int numCols, int numRows) throws Exception {
@@ -102,9 +102,8 @@ public class TextObject extends Object {
 	public void setText(String text) {
 	    this.text = text;
 	    Texture texture = this.getMesh().getTexture();
-	    this.getMesh().deleteBuffers();
 	    try {
-			this.setMesh(buildMesh(texture, numCols, numRows));
+			this.setMeshes(new Mesh[] { buildMesh(texture, numCols, numRows)});
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -128,6 +127,10 @@ public class TextObject extends Object {
 		}else {
 			this.movePosition(10000, 0, 0);
 		}
+	}
+	
+	public void reset() {
+		setText(text);
 	}
 	
 	public void moveDown(float amount) {

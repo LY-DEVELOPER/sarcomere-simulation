@@ -84,10 +84,18 @@ public class Object {
 	}
 
 	public void setMeshes(Mesh[] meshes) {
+		if(this.getMeshes() != null) {
+		for(Mesh m : this.getMeshes()) {
+			m.deleteBuffers();
+		}
+		}
 		this.meshes = meshes;
 	}
 
 	public void setMesh(Mesh mesh) {
+		for(Mesh m : this.getMeshes()) {
+			m.deleteBuffers();
+		}
 		this.meshes = new Mesh[] { mesh };
 	}
     public void setR(float x) {

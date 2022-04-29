@@ -22,7 +22,7 @@ public class CreateSceneObjects {
 		Mesh actin = OBJLoader.loadMesh("/assets/actin.obj");
 		actin.setTexture("./textures/texture.png");
 		actin.setColour(0, 0.58f, 1f, 1);
-		MD5Model myosin = MD5Model.parse("/assets/myosin.md5mesh");
+		MD5Model myosin = MD5Model.parse("/assets/mediummyosin.md5mesh");
 		MD5AnimModel animMyo = MD5AnimModel.parse("/assets/myosin.md5anim");
 		objects.add(new Object(skyBox));
 		objects.get(0).setScale(20f);

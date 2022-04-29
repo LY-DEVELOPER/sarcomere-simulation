@@ -20,4 +20,8 @@ public class Timer {
 	    timeCount += delta;
 	    return delta;
 	}
+	
+	public double getLastLoopTime() {
+		return lastLoopTime;
+	}
 }

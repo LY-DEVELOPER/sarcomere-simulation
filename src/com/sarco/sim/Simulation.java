@@ -50,11 +50,12 @@ public class Simulation implements Runnable {
 	boolean autoPlay = true;
 	boolean moveActin;
 	boolean actinReturn = false;
-	int speed = 10;
+	int speed = 100;
 	boolean vsync = true;
 	int fps = 100;
 	float step = 0;
 	int liveFPS;
+	String quality = "Medium";
 
 	private Map<Mesh, List<Object>> meshMap;
 	private Map<Mesh, List<TextObject>> textMeshMap;
@@ -76,6 +77,7 @@ public class Simulation implements Runnable {
 	ArrayList<Object> objects;
 	ArrayList<TextObject> textObjects;
 	ArrayList<Slider> sliderObjects;
+	Quality q = new Quality();
 
 	@Override
 	public void run() {
@@ -96,6 +98,7 @@ public class Simulation implements Runnable {
 		window.init(vsync);
 		shader = new ShaderProgram();
 		camera = new Camera();
+		q = new Quality();
 		meshMap = new HashMap<Mesh, List<Object>>();
 		glfwSetKeyCallback(window.getWindow(), keyCallback);
 		glfwSetScrollCallback(window.getWindow(), scrollCallback);
@@ -150,7 +153,7 @@ public class Simulation implements Runnable {
 		sliderObjects.add(new Slider("mTran", new Vector3f(0, 30 * 5 + 5, 1), 100));
 		textObjects.add(new TextObject("Actin Colour", font, 16, 16));
 		textObjects.get(9).setPosition(20f, 30 * 6 + 5, 1);
-		sliderObjects.add(new Slider("aColour", new Vector3f(0, 30 * 7 + 5, 1)));
+		sliderObjects.add(new Slider("aColour", new Vector3f(0, 30 * 7 + 5, 1), 100));
 		textObjects.add(new TextObject("Actin Transparency", font, 16, 16));
 		textObjects.get(10).setPosition(20f, 30 * 8 + 5, 1);
 		sliderObjects.add(new Slider("aTran", new Vector3f(0, 30 * 9 + 5, 1), 100));
@@ -161,7 +164,7 @@ public class Simulation implements Runnable {
 		textObjects.get(12).setPosition(20f, 30 * 4 + 5, 1);
 		sliderObjects.add(new Slider("speed", new Vector3f(0, 30 * 5 + 5, 1), (float) (speed / 5)));
 
-		textObjects.add(new TextObject("Quality: Low", font, 16, 16));
+		textObjects.add(new TextObject("Quality: Medium", font, 16, 16));
 		textObjects.get(13).setPosition(20f, 30 * 4 + 5, 1);
 		textObjects.add(new TextObject("V-sync: " + vsync, font, 16, 16));
 		textObjects.get(14).setPosition(20f, 30 * 5 + 5, 1);
@@ -183,7 +186,7 @@ public class Simulation implements Runnable {
 		textObjects.get(21).setPosition(20f, 30 * 10 + 5, 1);
 		textObjects.add(new TextObject("Space Bar: Contract", font, 16, 16));
 		textObjects.get(22).setPosition(20f, 30 * 11 + 5, 1);
-
+		
 		for (TextObject obj : textObjects) {
 			obj.setScale(0.3f);
 		}
@@ -203,24 +206,36 @@ public class Simulation implements Runnable {
 		while (running && !window.shouldClose()) {
 			delta = timer.getDelta();
 			averageFPS.add(Math.round(1 / delta));
-			if (averageFPS.size() >= 200) {
+			if (averageFPS.size() >= 10) {
 				int total = 0;
 				for (Integer i : averageFPS) {
 					total += i;
 				}
-				liveFPS = total / 200;
+				liveFPS = total / 10;
 				averageFPS = new ArrayList<Integer>();
 			}
 			update(delta);
 			render();
 			window.update(vsync);
 			if (!vsync) {
-				Thread.sleep(Math.round(Math.ceil((float) 1 / (fps + (0.5 * fps)) * 1000)));
+				wait((int) Math.round(((float) 1 / (float) fps)*100));
 			}
 		}
 	}
+	
+	public void wait(int ms)
+	{
+        float waitTime = 1f / fps;
+        double endTime = timer.getLastLoopTime() + waitTime;
+        while (timer.getTime() < endTime) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException ie) {
+            }
+        }
+	}
 
-	public void update(float delta) {
+	public void update(float delta) throws Exception {
 		step += delta / (float) (1 / (float) speed);
 		if (step >= 1) {
 			int stepInt = (int) Math.round(step);
@@ -240,7 +255,7 @@ public class Simulation implements Runnable {
 				});
 
 				if (moveActin) {
-					float amount = (float) (0.13 / 32) * stepInt;
+					float amount = (float) (0.06 / 32) * stepInt;
 					objects.get(3).movePosition(-amount, 0, 0);
 					objects.get(4).movePosition(-amount, 0, 0);
 					objects.get(5).movePosition(-amount, 0, 0);
@@ -258,7 +273,7 @@ public class Simulation implements Runnable {
 				});
 			} else if (actinReturn || !contract) {
 				if (objects.get(3).getPosition().x < 5) {
-					float amount = (float) (0.13 / 32) * stepInt;
+					float amount = (float) (0.06 / 32) * stepInt;
 					objects.get(3).movePosition(amount, 0, 0);
 					objects.get(4).movePosition(amount, 0, 0);
 					objects.get(5).movePosition(amount, 0, 0);
@@ -286,6 +301,7 @@ public class Simulation implements Runnable {
 		}
 
 		textObjects.get(12).setText("Speed:" + speed);
+		textObjects.get(13).setText("Quality:" + quality);
 		textObjects.get(15).setText("Target FPS:" + fps);
 
 		for (Object object : objects) {
@@ -310,7 +326,7 @@ public class Simulation implements Runnable {
 		moveActin = true;
 	}
 
-	public void render() {
+	public void render() throws Exception {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
 		if (window.isResized()) {
@@ -378,6 +394,13 @@ public class Simulation implements Runnable {
 		}
 
 		hudShader.unbind();
+		if(!quality.equals(q.getQuality())) {
+			q.set(quality, objects);
+//			for(TextObject t : textObjects) {
+//				t.reset();
+//			}
+		}
+		
 	}
 
 	public void cleanUp() {
@@ -409,10 +432,10 @@ public class Simulation implements Runnable {
 				camera.movePosition(-0.1f, 0, 0);
 			}
 			if (key == GLFW_KEY_UP && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-				camera.movePosition(0, 0.1f, 0);
+				camera.movePosition(0, 0.01f, 0);
 			}
 			if (key == GLFW_KEY_DOWN && (action == GLFW_REPEAT || action == GLFW_PRESS)) {
-				camera.movePosition(0, -0.1f, 0);
+				camera.movePosition(0, -0.01f, 0);
 			}
 			if (key == GLFW_KEY_C && action == GLFW_PRESS) {
 				camera.setRotation(0, 0, 0);
@@ -464,7 +487,7 @@ public class Simulation implements Runnable {
 				for (TextObject obj : textObjects) {
 					if (obj.isMouseOver(mouseX, mouseY)) {
 						mouseHold = false;
-						if (obj.getText().equals("AutoPlay:Off") || obj.getText().equals("AutoPlay:On")) {
+						if (obj.getText().contains("AutoPlay:")) {
 							autoPlay = !autoPlay;
 							contract = true;
 							if (actinReturn) {
@@ -475,13 +498,22 @@ public class Simulation implements Runnable {
 								contract = false;
 							}
 						}
-						if (obj.getText().equals("vsync: false") || obj.getText().equals("vsync: true")) {
+						if (obj.getText().contains("vsync:") || obj.getText().equals("vsync:")) {
 							vsync = !vsync;
 						}
 						if (obj.getText().equals("Re-Centre Camera")) {
 							camera.setRotation(0, 0, 0);
 							camera.setPosition(0, 0, 3);
 							camera.setScale(0.2f);
+						}
+						if (obj.getText().contains("Quality")) {
+							if(obj.getText().contains("Low")) {
+								quality = "Medium";
+							}else if(obj.getText().contains("Medium")) {
+								quality = "High";
+							}else {
+								quality = "Low";
+							}
 						}
 						if (obj.getText().equals("Appearance \21")) {
 							for (int i = 7; i < 11; i++) {
