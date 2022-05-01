@@ -55,7 +55,7 @@ public class Simulation implements Runnable {
 	int fps = 100;
 	float step = 0;
 	int liveFPS;
-	String quality = "Ultra";
+	String quality = "Medium";
 
 	private Map<Mesh, List<Object>> meshMap;
 	private Map<Mesh, List<TextObject>> textMeshMap;
@@ -134,63 +134,63 @@ public class Simulation implements Runnable {
 		textObjects.get(0).setPosition(10f, 5f, 1);
 		textObjects.add(new TextObject("FPS:" + liveFPS, font, 16, 16));
 		textObjects.get(1).setPosition(window.getWidth() - 190f, window.getHeight() - 40f, 1);
+		textObjects.add(new TextObject("Current Process:", font, 16, 16));
+		textObjects.get(2).setPosition(10f, window.getHeight() - 60f, 1);
 		textObjects.add(new TextObject("Contracting:Off", font, 16, 16));
-		textObjects.get(2).setPosition(window.getWidth() - 300f, 5f, 1);
+		textObjects.get(3).setPosition(window.getWidth() - 300f, 5f, 1);
 		textObjects.add(new TextObject("Appearance \21", font, 16, 16));
-		textObjects.get(3).setPosition(10f, 30 + 5, 1);
+		textObjects.get(4).setPosition(10f, 30 + 5, 1);
 		textObjects.add(new TextObject("View \21", font, 16, 16));
-		textObjects.get(4).setPosition(10f, 30 * 2 + 5, 1);
+		textObjects.get(5).setPosition(10f, 30 * 2 + 5, 1);
 		textObjects.add(new TextObject("Performance \21", font, 16, 16));
-		textObjects.get(5).setPosition(10f, 30 * 3 + 5, 1);
+		textObjects.get(6).setPosition(10f, 30 * 3 + 5, 1);
 		textObjects.add(new TextObject("Controls \21", font, 16, 16));
-		textObjects.get(6).setPosition(10f, 30 * 4 + 5, 1);
+		textObjects.get(7).setPosition(10f, 30 * 4 + 5, 1);
 
 		textObjects.add(new TextObject("Myosin Colour", font, 16, 16));
-		textObjects.get(7).setPosition(20f, 30 * 2 + 5, 1);
+		textObjects.get(8).setPosition(20f, 30 * 2 + 5, 1);
 		sliderObjects.add(new Slider("mColour", new Vector3f(0, 30 * 3 + 5, 1)));
 		textObjects.add(new TextObject("Myosin Transparency", font, 16, 16));
-		textObjects.get(8).setPosition(20f, 30 * 4 + 5, 1);
+		textObjects.get(9).setPosition(20f, 30 * 4 + 5, 1);
 		sliderObjects.add(new Slider("mTran", new Vector3f(0, 30 * 5 + 5, 1), 100));
 		textObjects.add(new TextObject("Actin Colour", font, 16, 16));
-		textObjects.get(9).setPosition(20f, 30 * 6 + 5, 1);
+		textObjects.get(10).setPosition(20f, 30 * 6 + 5, 1);
 		sliderObjects.add(new Slider("aColour", new Vector3f(0, 30 * 7 + 5, 1), 100));
 		textObjects.add(new TextObject("Actin Transparency", font, 16, 16));
-		textObjects.get(10).setPosition(20f, 30 * 8 + 5, 1);
+		textObjects.get(11).setPosition(20f, 30 * 8 + 5, 1);
 		sliderObjects.add(new Slider("aTran", new Vector3f(0, 30 * 9 + 5, 1), 100));
 
 		textObjects.add(new TextObject("Re-Centre Camera", font, 16, 16));
-		textObjects.get(11).setPosition(20f, 30 * 3 + 5, 1);
+		textObjects.get(12).setPosition(20f, 30 * 3 + 5, 1);
 		textObjects.add(new TextObject("Speed:" + speed, font, 16, 16));
-		textObjects.get(12).setPosition(20f, 30 * 4 + 5, 1);
+		textObjects.get(13).setPosition(20f, 30 * 4 + 5, 1);
 		sliderObjects.add(new Slider("speed", new Vector3f(0, 30 * 5 + 5, 1), (float) (speed / 5)));
 
 		textObjects.add(new TextObject("Quality: Medium", font, 16, 16));
-		textObjects.get(13).setPosition(20f, 30 * 4 + 5, 1);
+		textObjects.get(14).setPosition(20f, 30 * 4 + 5, 1);
 		textObjects.add(new TextObject("V-sync: " + vsync, font, 16, 16));
-		textObjects.get(14).setPosition(20f, 30 * 5 + 5, 1);
+		textObjects.get(15).setPosition(20f, 30 * 5 + 5, 1);
 		textObjects.add(new TextObject("FPS: " + fps, font, 16, 16));
-		textObjects.get(15).setPosition(20f, 30 * 6 + 5, 1);
+		textObjects.get(16).setPosition(20f, 30 * 6 + 5, 1);
 		sliderObjects.add(new Slider("fps", new Vector3f(0, 30 * 7 + 5, 1), fps / 2));
 
 		textObjects.add(new TextObject("Arrow Keys: Move Camera", font, 16, 16));
-		textObjects.get(16).setPosition(20f, 30 * 5 + 5, 1);
+		textObjects.get(17).setPosition(20f, 30 * 5 + 5, 1);
 		textObjects.add(new TextObject("Click + Drag: Rotate Camera", font, 16, 16));
-		textObjects.get(17).setPosition(20f, 30 * 6 + 5, 1);
+		textObjects.get(18).setPosition(20f, 30 * 6 + 5, 1);
 		textObjects.add(new TextObject("Scroll: Zoom", font, 16, 16));
-		textObjects.get(18).setPosition(20f, 30 * 7 + 5, 1);
+		textObjects.get(19).setPosition(20f, 30 * 7 + 5, 1);
 		textObjects.add(new TextObject("C: Center Camera", font, 16, 16));
-		textObjects.get(19).setPosition(20f, 30 * 8 + 5, 1);
-		textObjects.add(new TextObject("V/B: Speed Down/Up", font, 16, 16));
-		textObjects.get(20).setPosition(20f, 30 * 9 + 5, 1);
+		textObjects.get(20).setPosition(20f, 30 * 8 + 5, 1);
 		textObjects.add(new TextObject("A: Toggle AutoPlay", font, 16, 16));
-		textObjects.get(21).setPosition(20f, 30 * 10 + 5, 1);
+		textObjects.get(21).setPosition(20f, 30 * 9 + 5, 1);
 		textObjects.add(new TextObject("Space Bar: Contract", font, 16, 16));
-		textObjects.get(22).setPosition(20f, 30 * 11 + 5, 1);
-		
+		textObjects.get(22).setPosition(20f, 30 * 10 + 5, 1);
+
 		for (TextObject obj : textObjects) {
 			obj.setScale(0.3f);
 		}
-		for (int i = 7; i < textObjects.size(); i++) {
+		for (int i = 8; i < textObjects.size(); i++) {
 			textObjects.get(i).toggleVis();
 		}
 		sliderObjects.forEach((obj) -> {
@@ -218,21 +218,20 @@ public class Simulation implements Runnable {
 			render();
 			window.update(vsync);
 			if (!vsync) {
-				wait((int) Math.round(((float) 1 / (float) fps)*100));
+				wait((int) Math.round(((float) 1 / (float) fps) * 100));
 			}
 		}
 	}
-	
-	public void wait(int ms)
-	{
-        float waitTime = 1f / fps;
-        double endTime = timer.getLastLoopTime() + waitTime;
-        while (timer.getTime() < endTime) {
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException ie) {
-            }
-        }
+
+	public void wait(int ms) {
+		float waitTime = 1f / fps;
+		double endTime = timer.getLastLoopTime() + waitTime;
+		while (timer.getTime() < endTime) {
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException ie) {
+			}
+		}
 	}
 
 	public void update(float delta) throws Exception {
@@ -255,7 +254,7 @@ public class Simulation implements Runnable {
 				});
 
 				if (moveActin) {
-					float amount = (float) (0.06 / 32) * stepInt;
+					float amount = (float) (0.058 / 30) * stepInt;
 					objects.get(3).movePosition(-amount, 0, 0);
 					objects.get(4).movePosition(-amount, 0, 0);
 					objects.get(5).movePosition(-amount, 0, 0);
@@ -266,14 +265,14 @@ public class Simulation implements Runnable {
 					if (object instanceof AnimObject) {
 						((AnimObject) object).nextFrame(stepInt);
 						int frame = ((AnimObject) object).getCurrentFrameInt();
-						if (frame <= 16 || frame >= 80) {
+						if (frame <= 16 || frame >= 128) {
 							actinReturn = true;
 						}
 					}
 				});
 			} else if (actinReturn || !contract) {
 				if (objects.get(3).getPosition().x < 5) {
-					float amount = (float) (0.06 / 32) * stepInt;
+					float amount = (float) (0.058 / 30) * stepInt;
 					objects.get(3).movePosition(amount, 0, 0);
 					objects.get(4).movePosition(amount, 0, 0);
 					objects.get(5).movePosition(amount, 0, 0);
@@ -282,27 +281,54 @@ public class Simulation implements Runnable {
 					contract = true;
 					actinReturn = false;
 				}
+				objects.forEach((object) -> {
+					if (object instanceof AnimObject) {
+						int frame = ((AnimObject) object).getCurrentFrameInt();
+						if (frame > 0) {
+							((AnimObject) object).nextFrame(-stepInt);
+						}
+					}
+				});
 			}
 			step = 0;
-		}
-		if (autoPlay)
+			int curFrame = ((AnimObject) objects.get(20)).getCurrentFrameInt();
+			if (!contract) {
+				textObjects.get(2).setText("Current Process: No calcium is present so actin binding sites are covered");
+			} else {
+				if (curFrame >= 0 && curFrame < 16) {
+					textObjects.get(2).setText("Current Process: Myosin heads are resting with ADP + P attached");
+				}
+				if (curFrame >= 16 && curFrame < 32) {
+					textObjects.get(2).setText("Current Process: Myosin heads attach to actin binding site");
+				}
+				if (curFrame >= 32 && curFrame < 64) {
+					textObjects.get(2).setText("Current Process: ADP + P Unbind causing powerstroke");
+				}
+				if (curFrame >= 64 && curFrame < 110) {
+					textObjects.get(2).setText("Current Process: ATP binds causing head to release");
+				}
+				if (curFrame >= 110 && curFrame < 128) {
+					textObjects.get(2).setText("Current Process: ATP breaks down into ADP + P");
+				}
 
-		{
+			}
+		}
+		if (autoPlay) {
 			textObjects.get(0).setText("AutoPlay:On");
 		} else {
 			textObjects.get(0).setText("AutoPlay:Off");
 		}
 		textObjects.get(1).setText("FPS: " + liveFPS);
-		textObjects.get(14).setText("vsync: " + vsync);
+		textObjects.get(15).setText("vsync: " + vsync);
 		if (contract) {
-			textObjects.get(2).setText("Contracting:On");
+			textObjects.get(3).setText("Contracting:On");
 		} else {
-			textObjects.get(2).setText("Contracting:Off");
+			textObjects.get(3).setText("Contracting:Off");
 		}
 
-		textObjects.get(12).setText("Speed:" + speed);
-		textObjects.get(13).setText("Quality:" + quality);
-		textObjects.get(15).setText("Target FPS:" + fps);
+		textObjects.get(13).setText("Speed:" + speed);
+		textObjects.get(14).setText("Quality:" + quality);
+		textObjects.get(16).setText("Target FPS:" + fps);
 
 		for (Object object : objects) {
 			if (object instanceof AnimObject) {
@@ -331,7 +357,8 @@ public class Simulation implements Runnable {
 		glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
 		if (window.isResized()) {
 			textObjects.get(1).setPosition(window.getWidth() - 190f, window.getHeight() - 40f, 1);
-			textObjects.get(2).setPosition(window.getWidth() - 300f, 5f, 1);
+			textObjects.get(2).setPosition(10f, window.getHeight() - 60f, 1);
+			textObjects.get(3).setPosition(window.getWidth() - 300f, 5f, 1);
 			glViewport(0, 0, window.getWidth(), window.getHeight());
 			window.setResized(false);
 		}
@@ -394,11 +421,13 @@ public class Simulation implements Runnable {
 		}
 
 		hudShader.unbind();
-		if(!quality.equals(q.getQuality())) {
+		if (!quality.equals(q.getQuality())) {
 			q.set(quality, objects);
-			textObjects.forEach((obj) -> {obj.fixText();});
+			textObjects.forEach((obj) -> {
+				obj.fixText();
+			});
 		}
-		
+
 	}
 
 	public void cleanUp() {
@@ -505,25 +534,25 @@ public class Simulation implements Runnable {
 							camera.setScale(0.2f);
 						}
 						if (obj.getText().contains("Quality")) {
-							if(obj.getText().contains("Low")) {
+							if (obj.getText().contains("Low")) {
 								quality = "Medium";
-							}else if(obj.getText().contains("Medium")) {
+							} else if (obj.getText().contains("Medium")) {
 								quality = "High";
-							}else {
+							} else {
 								quality = "Low";
 							}
 						}
 						if (obj.getText().equals("Appearance \21")) {
-							for (int i = 7; i < 11; i++) {
+							for (int i = 8; i < 12; i++) {
 								textObjects.get(i).toggleVis();
 							}
 							for (int i = 0; i < 4; i++) {
 								sliderObjects.get(i).toggleVis();
 							}
-							textObjects.get(4).moveDown(8);
 							textObjects.get(5).moveDown(8);
 							textObjects.get(6).moveDown(8);
-							for (int i = 11; i < textObjects.size(); i++) {
+							textObjects.get(7).moveDown(8);
+							for (int i = 12; i < textObjects.size(); i++) {
 								textObjects.get(i).moveDown(8);
 							}
 							for (int i = 4; i < sliderObjects.size(); i++) {
@@ -531,16 +560,16 @@ public class Simulation implements Runnable {
 							}
 							obj.setText("Appearance \20");
 						} else if (obj.getText().equals("Appearance \20")) {
-							for (int i = 7; i < 11; i++) {
+							for (int i = 8; i < 12; i++) {
 								textObjects.get(i).toggleVis();
 							}
 							for (int i = 0; i < 4; i++) {
 								sliderObjects.get(i).toggleVis();
 							}
-							textObjects.get(4).moveDown(-8);
 							textObjects.get(5).moveDown(-8);
 							textObjects.get(6).moveDown(-8);
-							for (int i = 11; i < textObjects.size(); i++) {
+							textObjects.get(7).moveDown(-8);
+							for (int i = 12; i < textObjects.size(); i++) {
 								textObjects.get(i).moveDown(-8);
 							}
 							for (int i = 4; i < sliderObjects.size(); i++) {
@@ -549,13 +578,13 @@ public class Simulation implements Runnable {
 							obj.setText("Appearance \21");
 						}
 						if (obj.getText().equals("View \21")) {
-							for (int i = 11; i < 13; i++) {
+							for (int i = 12; i < 14; i++) {
 								textObjects.get(i).toggleVis();
 							}
 							sliderObjects.get(4).toggleVis();
-							textObjects.get(5).moveDown(3);
 							textObjects.get(6).moveDown(3);
-							for (int i = 13; i < textObjects.size(); i++) {
+							textObjects.get(7).moveDown(3);
+							for (int i = 14; i < textObjects.size(); i++) {
 								textObjects.get(i).moveDown(3);
 							}
 							for (int i = 5; i < sliderObjects.size(); i++) {
@@ -563,13 +592,13 @@ public class Simulation implements Runnable {
 							}
 							obj.setText("View \20");
 						} else if (obj.getText().equals("View \20")) {
-							for (int i = 11; i < 13; i++) {
+							for (int i = 12; i < 14; i++) {
 								textObjects.get(i).toggleVis();
 							}
 							sliderObjects.get(4).toggleVis();
-							textObjects.get(5).moveDown(-3);
 							textObjects.get(6).moveDown(-3);
-							for (int i = 13; i < textObjects.size(); i++) {
+							textObjects.get(7).moveDown(-3);
+							for (int i = 14; i < textObjects.size(); i++) {
 								textObjects.get(i).moveDown(-3);
 							}
 							for (int i = 5; i < sliderObjects.size(); i++) {
@@ -578,12 +607,12 @@ public class Simulation implements Runnable {
 							obj.setText("View \21");
 						}
 						if (obj.getText().equals("Performance \21")) {
-							for (int i = 13; i < 16; i++) {
+							for (int i = 14; i < 17; i++) {
 								textObjects.get(i).toggleVis();
 							}
 							sliderObjects.get(5).toggleVis();
-							textObjects.get(6).moveDown(4);
-							for (int i = 16; i < textObjects.size(); i++) {
+							textObjects.get(7).moveDown(4);
+							for (int i = 17; i < textObjects.size(); i++) {
 								textObjects.get(i).moveDown(4);
 							}
 							for (int i = 6; i < sliderObjects.size(); i++) {
@@ -591,12 +620,12 @@ public class Simulation implements Runnable {
 							}
 							obj.setText("Performance \20");
 						} else if (obj.getText().equals("Performance \20")) {
-							for (int i = 13; i < 16; i++) {
+							for (int i = 14; i < 17; i++) {
 								textObjects.get(i).toggleVis();
 							}
 							sliderObjects.get(5).toggleVis();
-							textObjects.get(6).moveDown(-4);
-							for (int i = 16; i < textObjects.size(); i++) {
+							textObjects.get(7).moveDown(-4);
+							for (int i = 17; i < textObjects.size(); i++) {
 								textObjects.get(i).moveDown(-4);
 							}
 							for (int i = 6; i < sliderObjects.size(); i++) {
@@ -605,12 +634,12 @@ public class Simulation implements Runnable {
 							obj.setText("Performance \21");
 						}
 						if (obj.getText().equals("Controls \21")) {
-							for (int i = 16; i < 23; i++) {
+							for (int i = 17; i < 23; i++) {
 								textObjects.get(i).toggleVis();
 							}
 							obj.setText("Controls \20");
 						} else if (obj.getText().equals("Controls \20")) {
-							for (int i = 16; i < 23; i++) {
+							for (int i = 17; i < 23; i++) {
 								textObjects.get(i).toggleVis();
 							}
 							obj.setText("Controls \21");

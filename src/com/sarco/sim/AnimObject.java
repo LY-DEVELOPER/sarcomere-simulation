@@ -47,6 +47,8 @@ public class AnimObject extends Object {
 	        int nextFrame = currentFrame + speed;    
 	        if ( nextFrame > frames.size() - 1) {
 	            currentFrame = 0;
+	        } else if (nextFrame < 0) {
+	        	nextFrame = 0;
 	        } else {
 	            currentFrame = nextFrame;
 	        }
