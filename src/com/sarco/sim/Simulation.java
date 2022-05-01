@@ -55,7 +55,7 @@ public class Simulation implements Runnable {
 	int fps = 100;
 	float step = 0;
 	int liveFPS;
-	String quality = "Medium";
+	String quality = "Ultra";
 
 	private Map<Mesh, List<Object>> meshMap;
 	private Map<Mesh, List<TextObject>> textMeshMap;
@@ -396,9 +396,7 @@ public class Simulation implements Runnable {
 		hudShader.unbind();
 		if(!quality.equals(q.getQuality())) {
 			q.set(quality, objects);
-//			for(TextObject t : textObjects) {
-//				t.reset();
-//			}
+			textObjects.forEach((obj) -> {obj.fixText();});
 		}
 		
 	}

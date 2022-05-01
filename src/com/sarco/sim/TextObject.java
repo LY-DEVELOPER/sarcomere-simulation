@@ -101,9 +101,17 @@ public class TextObject extends Object {
 
 	public void setText(String text) {
 	    this.text = text;
-	    Texture texture = this.getMesh().getTexture();
 	    try {
-			this.setMeshes(new Mesh[] { buildMesh(texture, numCols, numRows)});
+			this.setMeshes(new Mesh[] { buildMesh(this.getMeshes()[0].getTexture(), numCols, numRows)});
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void fixText() {
+	    try {
+			this.setMeshes(new Mesh[] { buildMesh(new Texture("./textures/font.png"), numCols, numRows)});
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
