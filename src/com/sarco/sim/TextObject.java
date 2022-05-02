@@ -86,14 +86,23 @@ public class TextObject extends Object {
             indices.add(i*VERTICES_PER_QUAD + 2);
         }
         
-        float[] posArr = MD5Loader.listToArray(positions);
-        float[] textCoordsArr = MD5Loader.listToArray(textCoords);
+        float[] posArr = listToArray(positions);
+        float[] textCoordsArr = listToArray(textCoords);
         int[] indicesArr = indices.stream().mapToInt(i->i).toArray();
         Mesh mesh = new Mesh(posArr, textCoordsArr, normals, indicesArr);
         mesh.setColour(colour.x, colour.y, colour.z, colour.w);
         mesh.setTexture(texture);
         return mesh;
 	}
+	
+	public static float[] listToArray(List<Float> list) {
+        int size = list != null ? list.size() : 0;
+        float[] floatArr = new float[size];
+        for (int i = 0; i < size; i++) {
+            floatArr[i] = list.get(i);
+        }
+        return floatArr;
+    }
 	
 	public String getText() {
 	    return text;

@@ -4,40 +4,16 @@ import static org.lwjgl.glfw.GLFW.*;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
-import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWScrollCallback;
-import org.lwjgl.glfw.GLFWVidMode;
-import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL30.*;
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
-import org.lwjgl.opengl.*;
-import org.joml.Vector4f;
-
 import com.sarco.sim.utilities.LoadShader;
 import com.sarco.sim.utilities.TimeTracker;
 
 import lwjglgamedev.modelLoaders.AnimatedFrame;
-import lwjglgamedev.modelLoaders.MD5AnimModel;
-import lwjglgamedev.modelLoaders.MD5Loader;
-import lwjglgamedev.modelLoaders.MD5Model;
-import lwjglgamedev.modelLoaders.OBJLoader;
-
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE2;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.lwjgl.system.MemoryUtil.NULL;
-
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class Simulation implements Runnable {
 

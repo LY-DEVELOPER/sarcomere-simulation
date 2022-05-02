@@ -1,5 +1,4 @@
 package lwjglgamedev.modelLoaders;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,7 +73,7 @@ public class MD5AnimModel {
     }
 
     public static MD5AnimModel parse(String animFile) throws Exception {
-        List<String> lines = OBJLoader.readAllLines(animFile);
+        List<String> lines = Utils.readAllLines(animFile);
 
         MD5AnimModel result = new MD5AnimModel();
 

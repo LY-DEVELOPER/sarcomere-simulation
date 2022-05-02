@@ -52,7 +52,7 @@ public class MD5Model {
     }
 
     public static MD5Model parse(String meshModelFile) throws Exception {
-        List<String> lines = OBJLoader.readAllLines(meshModelFile);
+        List<String> lines = Utils.readAllLines(meshModelFile);
 
         MD5Model result = new MD5Model();
 

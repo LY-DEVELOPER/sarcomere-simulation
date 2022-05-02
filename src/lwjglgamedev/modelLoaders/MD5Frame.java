@@ -51,7 +51,7 @@ public class MD5Frame {
                 data.addAll(lineData);
             }
         }
-        float[] dataArr = MD5Loader.listToArray(data);
+        float[] dataArr = Utils.listToArray(data);
         result.setFrameData(dataArr);
 
         return result;
