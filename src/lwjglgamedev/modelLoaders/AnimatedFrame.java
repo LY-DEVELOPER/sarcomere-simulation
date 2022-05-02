@@ -1,4 +1,4 @@
-package com.sarco.sim;
+package lwjglgamedev.modelLoaders;
 
 import java.util.Arrays;
 import org.joml.Matrix4f;

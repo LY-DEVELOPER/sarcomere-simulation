@@ -1,4 +1,4 @@
-package com.sarco.sim.utilities;
+package lwjglgamedev.modelLoaders;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

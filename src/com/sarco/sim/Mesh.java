@@ -127,7 +127,8 @@ public class Mesh {
 			}
 		}
 	}
-	private void initRender() {
+	
+    public void render() {
         if (texture != null) {
             // Activate first texture bank
             glActiveTexture(GL_TEXTURE0);
@@ -137,34 +138,13 @@ public class Mesh {
 
         // Draw the mesh
         glBindVertexArray(VAO);
-    }
 
-    private void endRender() {
+        glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+
         // Restore state
         glBindVertexArray(0);
 
         glBindTexture(GL_TEXTURE_2D, 0);
-    }
-
-    public void render() {
-        initRender();
-
-        glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
-
-        endRender();
-    }
-
-    public void renderList(List<Object> objects, Consumer<Object> consumer) {
-        initRender();
-
-        for (Object object : objects) {
-            // Set up data required by GameItem
-            consumer.accept(object);
-            // Render this game item
-            glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
-        }
-
-        endRender();
     }
 
     public void cleanUp() {

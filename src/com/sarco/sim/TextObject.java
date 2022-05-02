@@ -7,7 +7,7 @@ import java.util.List;
 import org.joml.Vector4f;
 import org.joml.Vector4i;
 
-import com.sarco.sim.utilities.MD5Loader;
+import lwjglgamedev.modelLoaders.MD5Loader;
 
 public class TextObject extends Object {
 	private static final float ZPOS = 0.0f;

@@ -5,6 +5,8 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
+import lwjglgamedev.modelLoaders.AnimatedFrame;
+
 public class AnimObject extends Object {
 	 private int currentFrame;
 	    

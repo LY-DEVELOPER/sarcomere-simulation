@@ -1,4 +1,4 @@
-package com.sarco.sim.utilities;
+package lwjglgamedev.modelLoaders;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;

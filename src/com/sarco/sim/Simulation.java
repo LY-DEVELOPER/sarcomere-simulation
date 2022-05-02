@@ -19,11 +19,13 @@ import org.lwjgl.opengl.*;
 import org.joml.Vector4f;
 
 import com.sarco.sim.utilities.LoadShader;
-import com.sarco.sim.utilities.MD5AnimModel;
-import com.sarco.sim.utilities.MD5Loader;
-import com.sarco.sim.utilities.MD5Model;
-import com.sarco.sim.utilities.OBJLoader;
-import com.sarco.sim.utilities.Timer;
+import com.sarco.sim.utilities.TimeTracker;
+
+import lwjglgamedev.modelLoaders.AnimatedFrame;
+import lwjglgamedev.modelLoaders.MD5AnimModel;
+import lwjglgamedev.modelLoaders.MD5Loader;
+import lwjglgamedev.modelLoaders.MD5Model;
+import lwjglgamedev.modelLoaders.OBJLoader;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE2;
@@ -40,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 public class Simulation implements Runnable {
 
 	Window window;
-	Timer timer;
+	TimeTracker timer;
 	ShaderProgram shader;
 	ShaderProgram hudShader;
 	Camera camera;
@@ -56,9 +58,6 @@ public class Simulation implements Runnable {
 	float step = 0;
 	int liveFPS;
 	String quality = "Medium";
-
-	private Map<Mesh, List<Object>> meshMap;
-	private Map<Mesh, List<TextObject>> textMeshMap;
 
 	private static final float FOV = (float) Math.toRadians(60.0f);
 
@@ -93,13 +92,12 @@ public class Simulation implements Runnable {
 
 	public void init() throws Exception {
 		window = new Window();
-		timer = new Timer();
+		timer = new TimeTracker();
 		transformation = new Transformations();
 		window.init(vsync);
 		shader = new ShaderProgram();
 		camera = new Camera();
 		q = new Quality();
-		meshMap = new HashMap<Mesh, List<Object>>();
 		glfwSetKeyCallback(window.getWindow(), keyCallback);
 		glfwSetScrollCallback(window.getWindow(), scrollCallback);
 		glfwSetCursorPosCallback(window.getWindow(), cursorCallback);
@@ -201,11 +199,11 @@ public class Simulation implements Runnable {
 
 	public void simLoop() throws Exception {
 		boolean running = true;
-		float delta;
+		float timeSince;
 		ArrayList<Integer> averageFPS = new ArrayList<Integer>();
 		while (running && !window.shouldClose()) {
-			delta = timer.getDelta();
-			averageFPS.add(Math.round(1 / delta));
+			timeSince = timer.getTimeSince();
+			averageFPS.add(Math.round(1 / timeSince));
 			if (averageFPS.size() >= 10) {
 				int total = 0;
 				for (Integer i : averageFPS) {
@@ -214,7 +212,7 @@ public class Simulation implements Runnable {
 				liveFPS = total / 10;
 				averageFPS = new ArrayList<Integer>();
 			}
-			update(delta);
+			update(timeSince);
 			render();
 			window.update(vsync);
 			if (!vsync) {
@@ -225,8 +223,8 @@ public class Simulation implements Runnable {
 
 	public void wait(int ms) {
 		float waitTime = 1f / fps;
-		double endTime = timer.getLastLoopTime() + waitTime;
-		while (timer.getTime() < endTime) {
+		double endTime = timer.getLastLoop() + waitTime;
+		while (timer.getSystemTime() < endTime) {
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException ie) {
@@ -234,8 +232,8 @@ public class Simulation implements Runnable {
 		}
 	}
 
-	public void update(float delta) throws Exception {
-		step += delta / (float) (1 / (float) speed);
+	public void update(float timeSince) throws Exception {
+		step += timeSince / (float) (1 / (float) speed);
 		if (step >= 1) {
 			int stepInt = (int) Math.round(step);
 			moveActin = false;

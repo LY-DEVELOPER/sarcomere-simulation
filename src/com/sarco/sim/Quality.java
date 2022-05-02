@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import org.joml.Vector3f;
 
-import com.sarco.sim.utilities.MD5AnimModel;
-import com.sarco.sim.utilities.MD5Loader;
-import com.sarco.sim.utilities.MD5Model;
+import lwjglgamedev.modelLoaders.MD5AnimModel;
+import lwjglgamedev.modelLoaders.MD5Loader;
+import lwjglgamedev.modelLoaders.MD5Model;
 
 public class Quality {
 	

@@ -1,4 +1,4 @@
-package com.sarco.sim.utilities;
+package lwjglgamedev.modelLoaders;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,22 +9,11 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import com.sarco.sim.AnimObject;
-import com.sarco.sim.AnimVertex;
-import com.sarco.sim.AnimatedFrame;
 import com.sarco.sim.Mesh;
 import com.sarco.sim.Texture;
 
 public class MD5Loader {
 
-    /**
-     * Constructs and AnimGameItem instace based on a MD5 Model an MD5 Animation
-     *
-     * @param md5Model The MD5 Model
-     * @param animModel The MD5 Animation
-     * @param defaultColour Default colour to use if there are no textures
-     * @return
-     * @throws Exception
-     */
     public static AnimObject process(MD5Model md5Model, MD5AnimModel animModel) throws Exception {
         List<Matrix4f> invJointMatrices = calcInJointMatrices(md5Model);
         List<AnimatedFrame> animatedFrames = processAnimationFrames(md5Model, animModel, invJointMatrices);
@@ -48,10 +37,6 @@ public class MD5Loader {
 
         List<MD5JointInfo.MD5JointData> joints = md5Model.getJointInfo().getJoints();
         for (MD5JointInfo.MD5JointData joint : joints) {
-            // Calculate translation matrix using joint position
-            // Calculates rotation matrix using joint orientation
-            // Gets transformation matrix bu multiplying translation matrix by rotation matrix
-            // Instead of multiplying we can apply rotation which is optimized internally
             Matrix4f mat = new Matrix4f()
                     .translate(joint.getPosition())
                     .rotate(joint.getOrientation())
@@ -100,7 +85,6 @@ public class MD5Loader {
             indices.add(tri.getVertex1());
             indices.add(tri.getVertex2());
 
-            // Normals
             AnimVertex v0 = vertices.get(tri.getVertex0());
             AnimVertex v1 = vertices.get(tri.getVertex1());
             AnimVertex v2 = vertices.get(tri.getVertex2());
@@ -115,7 +99,6 @@ public class MD5Loader {
             v2.normal.add(normal);
         }
 
-        // Once the contributions have been added, normalize the result
         for(AnimVertex v : vertices) {
             v.normal.normalize();
         }
@@ -170,16 +153,12 @@ public class MD5Loader {
             if ((flags & 32) > 0) {
                 orientation.z = frameData[startIndex++];
             }
-            // Update Quaternion's w component
             orientation = MD5Utils.calculateQuaternion(orientation.x, orientation.y, orientation.z);
 
-            // Calculate translation and rotation matrices for this joint
             Matrix4f translateMat = new Matrix4f().translate(position);
             Matrix4f rotationMat = new Matrix4f().rotate(orientation);
             Matrix4f jointMat = translateMat.mul(rotationMat);
 
-            // Joint position is relative to joint's parent index position. Use parent matrices
-            // to transform it to model space
             if (joint.getParentIndex() > -1) {
                 Matrix4f parentMatrix = result.getLocalJointMatrices()[joint.getParentIndex()];
                 jointMat = new Matrix4f(parentMatrix).mul(jointMat);

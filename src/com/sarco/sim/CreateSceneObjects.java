@@ -2,10 +2,10 @@ package com.sarco.sim;
 
 import java.util.ArrayList;
 
-import com.sarco.sim.utilities.MD5AnimModel;
-import com.sarco.sim.utilities.MD5Loader;
-import com.sarco.sim.utilities.MD5Model;
-import com.sarco.sim.utilities.OBJLoader;
+import lwjglgamedev.modelLoaders.MD5AnimModel;
+import lwjglgamedev.modelLoaders.MD5Loader;
+import lwjglgamedev.modelLoaders.MD5Model;
+import lwjglgamedev.modelLoaders.OBJLoader;
 
 public class CreateSceneObjects {
 
