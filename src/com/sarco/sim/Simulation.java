@@ -41,8 +41,6 @@ public class Simulation implements Runnable {
 
 	private static final float Z_FAR = 1000.f;
 
-	float i = 0.1f;
-
 	double mouseX;
 	double mouseY;
 	boolean mouseHold;
@@ -60,7 +58,6 @@ public class Simulation implements Runnable {
 			init();
 			simLoop();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		cleanUp();
@@ -103,7 +100,8 @@ public class Simulation implements Runnable {
 		sliderObjects = new ArrayList<Slider>();
 
 		String font = "./textures/font.png";
-
+		
+		// Adding the ui objects
 		textObjects.add(new TextObject("AutoPlay:Off", font, 16, 16));
 		textObjects.get(0).setPosition(10f, 5f, 1);
 		textObjects.add(new TextObject("FPS:" + liveFPS, font, 16, 16));
@@ -161,25 +159,34 @@ public class Simulation implements Runnable {
 		textObjects.add(new TextObject("Space Bar: Contract", font, 16, 16));
 		textObjects.get(22).setPosition(20f, 30 * 10 + 5, 1);
 
+		// setting all the text objects to the same scale
 		for (TextObject obj : textObjects) {
 			obj.setScale(0.3f);
 		}
+		// making specific text objects invisible
 		for (int i = 8; i < textObjects.size(); i++) {
 			textObjects.get(i).toggleVis();
 		}
+		
+		// making slider objects invisible
 		sliderObjects.forEach((obj) -> {
 			obj.toggleVis();
 		});
+		
+		// set view port to screen size
 		glViewport(0, 0, window.getWidth(), window.getHeight());
 	}
 
 	public void simLoop() throws Exception {
-		boolean running = true;
 		float timeSince;
+		// array to store fps to then  get average
 		ArrayList<Integer> averageFPS = new ArrayList<Integer>();
-		while (running && !window.shouldClose()) {
+		// while the window is open keep the game loop running
+		while (!window.shouldClose()) {
 			timeSince = timer.getTimeSince();
+			//add fps to average
 			averageFPS.add(Math.round(1 / timeSince));
+			//set the live fps to the average of 10 fps
 			if (averageFPS.size() >= 10) {
 				int total = 0;
 				for (Integer i : averageFPS) {
@@ -188,9 +195,11 @@ public class Simulation implements Runnable {
 				liveFPS = total / 10;
 				averageFPS = new ArrayList<Integer>();
 			}
+			// run the loop functions
 			update(timeSince);
 			render();
 			window.update(vsync);
+			// if vsync is not true run the wait function
 			if (!vsync) {
 				wait((int) Math.round(((float) 1 / (float) fps) * 100));
 			}
@@ -198,6 +207,7 @@ public class Simulation implements Runnable {
 	}
 
 	public void wait(int ms) {
+		// make the program sleep for as many miliseconds as required to match fps
 		float waitTime = 1f / fps;
 		double endTime = timer.getLastLoop() + waitTime;
 		while (timer.getSystemTime() < endTime) {
@@ -209,13 +219,18 @@ public class Simulation implements Runnable {
 	}
 
 	public void update(float timeSince) throws Exception {
+		// step is the amount of frames of the animation to play
+		// if animation is slower than fps step will be added to each frame until it equals 1
 		step += timeSince / (float) (1 / (float) speed);
 		if (step >= 1) {
 			int stepInt = (int) Math.round(step);
 			moveActin = false;
+			// if the actin is fully contracted during autoplay uncontract
 			if (objects.get(3).getPosition().x <= 0.3 && autoPlay) {
 				contract = false;
 			}
+			
+			//if contracting play animation and move actin
 			if (objects.get(3).getPosition().x > 0.3 && !actinReturn && contract) {
 				objects.forEach((object) -> {
 					if (object instanceof AnimObject) {
@@ -234,6 +249,7 @@ public class Simulation implements Runnable {
 					objects.get(5).movePosition(-amount, 0, 0);
 					objects.get(6).movePosition(-amount, 0, 0);
 				}
+				// if not contracting and not returning set myosin to releaxed state
 			} else if (!actinReturn && !contract) {
 				objects.forEach((object) -> {
 					if (object instanceof AnimObject) {
@@ -244,6 +260,7 @@ public class Simulation implements Runnable {
 						}
 					}
 				});
+				// if not contracting and returning move actin back until its at neggining
 			} else if (actinReturn || !contract) {
 				if (objects.get(3).getPosition().x < 5) {
 					float amount = (float) (0.058 / 30) * stepInt;
@@ -251,10 +268,13 @@ public class Simulation implements Runnable {
 					objects.get(4).movePosition(amount, 0, 0);
 					objects.get(5).movePosition(amount, 0, 0);
 					objects.get(6).movePosition(amount, 0, 0);
+					// once fully returned and auto play is true start contracting again
 				} else if (autoPlay) {
 					contract = true;
 					actinReturn = false;
 				}
+				
+				// return myosin to relaxed state
 				objects.forEach((object) -> {
 					if (object instanceof AnimObject) {
 						int frame = ((AnimObject) object).getCurrentFrameInt();
@@ -264,7 +284,9 @@ public class Simulation implements Runnable {
 					}
 				});
 			}
+			// reset steps
 			step = 0;
+			// based on current position of myosin set current process text to the corresponding stage
 			int curFrame = ((AnimObject) objects.get(20)).getCurrentFrameInt();
 			if (!contract) {
 				textObjects.get(2).setText("Current Process: No calcium is present so actin binding sites are covered");
@@ -287,6 +309,8 @@ public class Simulation implements Runnable {
 
 			}
 		}
+		
+		// next few if statements update text to match values
 		if (autoPlay) {
 			textObjects.get(0).setText("AutoPlay:On");
 		} else {
@@ -304,6 +328,7 @@ public class Simulation implements Runnable {
 		textObjects.get(14).setText("Quality:" + quality);
 		textObjects.get(16).setText("Target FPS:" + fps);
 
+		// update object colours to match sliders
 		for (Object object : objects) {
 			if (object instanceof AnimObject) {
 				Vector3f i = valueToColour(sliderObjects.get(0).value);
@@ -317,7 +342,8 @@ public class Simulation implements Runnable {
 		objects.get(4).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
 		objects.get(5).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
 		objects.get(6).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
-
+		
+		// update values to match sliders
 		speed = (int) Math.round(sliderObjects.get(4).value * 5);
 		fps = (int) Math.round(sliderObjects.get(5).value * 2 + 20);
 	}
@@ -327,8 +353,10 @@ public class Simulation implements Runnable {
 	}
 
 	public void render() throws Exception {
+		// clear window
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
+		// fix positions of hud items and viewport when window is resized 
 		if (window.isResized()) {
 			textObjects.get(1).setPosition(window.getWidth() - 190f, window.getHeight() - 40f, 1);
 			textObjects.get(2).setPosition(10f, window.getHeight() - 60f, 1);
@@ -337,15 +365,18 @@ public class Simulation implements Runnable {
 			window.setResized(false);
 		}
 		shader.bind();
-		// Update projection Matrix
+		
+		// set projection matric
 		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
 				Z_NEAR, Z_FAR);
 		shader.setUniform("projectionMatrix", projectionMatrix);
 
 		shader.setUniform("texture_sampler", 0);
-
+		
+		// set view matrix
 		Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 
+		// render objects with corresponding uniforms
 		for (Object object : objects) {
 
 			Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(object, viewMatrix);
@@ -366,7 +397,8 @@ public class Simulation implements Runnable {
 		shader.unbind();
 
 		hudShader.bind();
-
+		
+		// render hud objects with corresponding uniforms
 		Matrix4f ortho = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
 		for (Object object : textObjects) {
 			Mesh mesh = object.getMesh();
@@ -395,6 +427,8 @@ public class Simulation implements Runnable {
 		}
 
 		hudShader.unbind();
+		
+		// if qualitys dont match update quality to new quality
 		if (!quality.equals(q.getQuality())) {
 			q.set(quality, objects);
 			textObjects.forEach((obj) -> {
@@ -405,6 +439,7 @@ public class Simulation implements Runnable {
 	}
 
 	public void cleanUp() {
+		//Clean up objects from memory
 		keyCallback.free();
 		window.cleanUp();
 		shader.cleanUp();
@@ -468,7 +503,6 @@ public class Simulation implements Runnable {
 	private GLFWMouseButtonCallback mouseCallback = new GLFWMouseButtonCallback() {
 		@Override
 		public void invoke(long window, int button, int action, int mods) {
-			// TODO Auto-generated method stub
 			if (button == GLFW_MOUSE_BUTTON_LEFT && GLFW_PRESS == action) {
 				mouseHold = true;
 				lastX = mouseX;
@@ -628,7 +662,6 @@ public class Simulation implements Runnable {
 
 		@Override
 		public void invoke(long window, double xoffset, double yoffset) {
-			// TODO Auto-generated method stub
 			camera.camZoom((float) yoffset / 5);
 		}
 	};
@@ -669,7 +702,6 @@ public class Simulation implements Runnable {
 
 		@Override
 		public void invoke(long window, double xpos, double ypos) {
-			// TODO Auto-generated method stub
 			mouseX = xpos;
 			mouseY = ypos;
 			float mouseMoveX = ((float) lastY - (float) mouseY);
