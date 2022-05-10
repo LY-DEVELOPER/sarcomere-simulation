@@ -11,19 +11,21 @@ public class Slider {
 	TextObject bar;
 	TextObject picker;
 	
-	public Slider(String id, Vector3f position, float value) throws Exception {
+	public Slider(String id, Vector3f position, float value, TextMesh meshes) throws Exception {
 		this.id = id;
 		this.value = value;
-		bar = new TextObject(" \23\23\23\23\23\23\23\23\23\23\23 ", "./textures/font.png", 16, 16);
-		picker = new TextObject("\22", "./textures/font.png", 16, 16);
+		bar = new TextObject(" \23\23\23\23\23\23\23\23\23\23\23 ", meshes);
+		picker = new TextObject("\22", meshes);
 		bar.setPosition(position.x, position.y, position.z);
 		bar.setScale(0.3f);
 		picker.setPosition(position.x + (192 * (value / 100)) + (0.3f*64), position.y, position.z);
 		picker.setScale(0.3f);
+		bar.fix();
+		picker.fix();
 	}
 
-	public Slider(String id, Vector3f position) throws Exception {
-		this(id, position, 50);
+	public Slider(String id, Vector3f position, TextMesh meshes) throws Exception {
+		this(id, position, 50, meshes);
 	}
 	
 	public void moveDown(float amount) {

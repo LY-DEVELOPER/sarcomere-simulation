@@ -13,6 +13,8 @@ import com.sarco.sim.utilities.LoadShader;
 import com.sarco.sim.utilities.TimeTracker;
 
 import lwjglgamedev.modelLoaders.AnimatedFrame;
+
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 public class Simulation implements Runnable {
@@ -50,6 +52,7 @@ public class Simulation implements Runnable {
 	ArrayList<Object> objects;
 	ArrayList<TextObject> textObjects;
 	ArrayList<Slider> sliderObjects;
+	TextMesh textMesh;
 	Quality q = new Quality();
 
 	@Override
@@ -70,6 +73,7 @@ public class Simulation implements Runnable {
 		window.init(vsync);
 		shader = new ShaderProgram();
 		camera = new Camera();
+		textMesh =  new TextMesh();
 		q = new Quality();
 		glfwSetKeyCallback(window.getWindow(), keyCallback);
 		glfwSetScrollCallback(window.getWindow(), scrollCallback);
@@ -78,6 +82,7 @@ public class Simulation implements Runnable {
 		shader.createVertexShader(LoadShader.load("/assets/vertex.vs"));
 		shader.createFragmentShader(LoadShader.load("/assets/fragment.fs"));
 		shader.link();
+		// Creating uniforms for the shaders
 		shader.createUniform("projectionMatrix");
 		shader.createUniform("modelViewMatrix");
 		shader.createUniform("texture_sampler");
@@ -95,98 +100,97 @@ public class Simulation implements Runnable {
 		camera.setScale(0.2f);
 
 		objects = CreateSceneObjects.gen();
-
+		
 		textObjects = new ArrayList<TextObject>();
 		sliderObjects = new ArrayList<Slider>();
 
-		String font = "./textures/font.png";
-		
 		// Adding the ui objects
-		textObjects.add(new TextObject("AutoPlay:Off", font, 16, 16));
+		textObjects.add(new TextObject("AutoPlay:On", textMesh));
 		textObjects.get(0).setPosition(10f, 5f, 1);
-		textObjects.add(new TextObject("FPS:" + liveFPS, font, 16, 16));
+		textObjects.add(new TextObject("FPS:" + liveFPS, textMesh));
 		textObjects.get(1).setPosition(window.getWidth() - 190f, window.getHeight() - 40f, 1);
-		textObjects.add(new TextObject("Current Process:", font, 16, 16));
+		textObjects.add(new TextObject("Current Process:", textMesh));
 		textObjects.get(2).setPosition(10f, window.getHeight() - 60f, 1);
-		textObjects.add(new TextObject("Contracting:Off", font, 16, 16));
+		textObjects.add(new TextObject("Contracting:Off", textMesh));
 		textObjects.get(3).setPosition(window.getWidth() - 300f, 5f, 1);
-		textObjects.add(new TextObject("Appearance \21", font, 16, 16));
+		textObjects.add(new TextObject("Appearance \21", textMesh));
 		textObjects.get(4).setPosition(10f, 30 + 5, 1);
-		textObjects.add(new TextObject("View \21", font, 16, 16));
+		textObjects.add(new TextObject("View \21", textMesh));
 		textObjects.get(5).setPosition(10f, 30 * 2 + 5, 1);
-		textObjects.add(new TextObject("Performance \21", font, 16, 16));
+		textObjects.add(new TextObject("Performance \21", textMesh));
 		textObjects.get(6).setPosition(10f, 30 * 3 + 5, 1);
-		textObjects.add(new TextObject("Controls \21", font, 16, 16));
+		textObjects.add(new TextObject("Controls \21", textMesh));
 		textObjects.get(7).setPosition(10f, 30 * 4 + 5, 1);
 
-		textObjects.add(new TextObject("Myosin Colour", font, 16, 16));
+		textObjects.add(new TextObject("Myosin Colour", textMesh));
 		textObjects.get(8).setPosition(20f, 30 * 2 + 5, 1);
-		sliderObjects.add(new Slider("mColour", new Vector3f(0, 30 * 3 + 5, 1)));
-		textObjects.add(new TextObject("Myosin Transparency", font, 16, 16));
+		sliderObjects.add(new Slider("mColour", new Vector3f(0, 30 * 3 + 5, 1), textMesh));
+		textObjects.add(new TextObject("Myosin Transparency", textMesh));
 		textObjects.get(9).setPosition(20f, 30 * 4 + 5, 1);
-		sliderObjects.add(new Slider("mTran", new Vector3f(0, 30 * 5 + 5, 1), 100));
-		textObjects.add(new TextObject("Actin Colour", font, 16, 16));
+		sliderObjects.add(new Slider("mTran", new Vector3f(0, 30 * 5 + 5, 1), 100, textMesh));
+		textObjects.add(new TextObject("Actin Colour", textMesh));
 		textObjects.get(10).setPosition(20f, 30 * 6 + 5, 1);
-		sliderObjects.add(new Slider("aColour", new Vector3f(0, 30 * 7 + 5, 1), 100));
-		textObjects.add(new TextObject("Actin Transparency", font, 16, 16));
+		sliderObjects.add(new Slider("aColour", new Vector3f(0, 30 * 7 + 5, 1), 100, textMesh));
+		textObjects.add(new TextObject("Actin Transparency", textMesh));
 		textObjects.get(11).setPosition(20f, 30 * 8 + 5, 1);
-		sliderObjects.add(new Slider("aTran", new Vector3f(0, 30 * 9 + 5, 1), 100));
+		sliderObjects.add(new Slider("aTran", new Vector3f(0, 30 * 9 + 5, 1), 100, textMesh));
 
-		textObjects.add(new TextObject("Re-Centre Camera", font, 16, 16));
+		textObjects.add(new TextObject("Re-Centre Camera", textMesh));
 		textObjects.get(12).setPosition(20f, 30 * 3 + 5, 1);
-		textObjects.add(new TextObject("Speed:" + speed, font, 16, 16));
+		textObjects.add(new TextObject("Speed:" + speed, textMesh));
 		textObjects.get(13).setPosition(20f, 30 * 4 + 5, 1);
-		sliderObjects.add(new Slider("speed", new Vector3f(0, 30 * 5 + 5, 1), (float) (speed / 5)));
+		sliderObjects.add(new Slider("speed", new Vector3f(0, 30 * 5 + 5, 1), (float) (speed / 5), textMesh));
 
-		textObjects.add(new TextObject("Quality: Medium", font, 16, 16));
+		textObjects.add(new TextObject("Quality: Medium", textMesh));
 		textObjects.get(14).setPosition(20f, 30 * 4 + 5, 1);
-		textObjects.add(new TextObject("V-sync: " + vsync, font, 16, 16));
+		textObjects.add(new TextObject("V-sync: " + vsync, textMesh));
 		textObjects.get(15).setPosition(20f, 30 * 5 + 5, 1);
-		textObjects.add(new TextObject("FPS: " + fps, font, 16, 16));
+		textObjects.add(new TextObject("FPS: " + fps, textMesh));
 		textObjects.get(16).setPosition(20f, 30 * 6 + 5, 1);
-		sliderObjects.add(new Slider("fps", new Vector3f(0, 30 * 7 + 5, 1), fps / 2));
+		sliderObjects.add(new Slider("fps", new Vector3f(0, 30 * 7 + 5, 1), fps / 2, textMesh));
 
-		textObjects.add(new TextObject("Arrow Keys: Move Camera", font, 16, 16));
+		textObjects.add(new TextObject("Arrow Keys: Move Camera", textMesh));
 		textObjects.get(17).setPosition(20f, 30 * 5 + 5, 1);
-		textObjects.add(new TextObject("Click + Drag: Rotate Camera", font, 16, 16));
+		textObjects.add(new TextObject("Click + Drag: Rotate Camera", textMesh));
 		textObjects.get(18).setPosition(20f, 30 * 6 + 5, 1);
-		textObjects.add(new TextObject("Scroll: Zoom", font, 16, 16));
+		textObjects.add(new TextObject("Scroll: Zoom", textMesh));
 		textObjects.get(19).setPosition(20f, 30 * 7 + 5, 1);
-		textObjects.add(new TextObject("C: Center Camera", font, 16, 16));
+		textObjects.add(new TextObject("C: Center Camera", textMesh));
 		textObjects.get(20).setPosition(20f, 30 * 8 + 5, 1);
-		textObjects.add(new TextObject("A: Toggle AutoPlay", font, 16, 16));
+		textObjects.add(new TextObject("A: Toggle AutoPlay", textMesh));
 		textObjects.get(21).setPosition(20f, 30 * 9 + 5, 1);
-		textObjects.add(new TextObject("Space Bar: Contract", font, 16, 16));
+		textObjects.add(new TextObject("Space Bar: Contract", textMesh));
 		textObjects.get(22).setPosition(20f, 30 * 10 + 5, 1);
 
 		// setting all the text objects to the same scale
 		for (TextObject obj : textObjects) {
 			obj.setScale(0.3f);
+			obj.fix();
 		}
 		// making specific text objects invisible
 		for (int i = 8; i < textObjects.size(); i++) {
 			textObjects.get(i).toggleVis();
 		}
-		
+
 		// making slider objects invisible
 		sliderObjects.forEach((obj) -> {
 			obj.toggleVis();
 		});
-		
+
 		// set view port to screen size
 		glViewport(0, 0, window.getWidth(), window.getHeight());
 	}
 
 	public void simLoop() throws Exception {
 		float timeSince;
-		// array to store fps to then  get average
+		// array to store fps to then get average
 		ArrayList<Integer> averageFPS = new ArrayList<Integer>();
 		// while the window is open keep the game loop running
 		while (!window.shouldClose()) {
 			timeSince = timer.getTimeSince();
-			//add fps to average
+			// add fps to average
 			averageFPS.add(Math.round(1 / timeSince));
-			//set the live fps to the average of 10 fps
+			// set the live fps to the average of 10 fps
 			if (averageFPS.size() >= 10) {
 				int total = 0;
 				for (Integer i : averageFPS) {
@@ -220,7 +224,8 @@ public class Simulation implements Runnable {
 
 	public void update(float timeSince) throws Exception {
 		// step is the amount of frames of the animation to play
-		// if animation is slower than fps step will be added to each frame until it equals 1
+		// if animation is slower than fps step will be added to each frame until it
+		// equals 1
 		step += timeSince / (float) (1 / (float) speed);
 		if (step >= 1) {
 			int stepInt = (int) Math.round(step);
@@ -229,8 +234,8 @@ public class Simulation implements Runnable {
 			if (objects.get(3).getPosition().x <= 0.3 && autoPlay) {
 				contract = false;
 			}
-			
-			//if contracting play animation and move actin
+
+			// if contracting play animation and move actin
 			if (objects.get(3).getPosition().x > 0.3 && !actinReturn && contract) {
 				objects.forEach((object) -> {
 					if (object instanceof AnimObject) {
@@ -273,7 +278,7 @@ public class Simulation implements Runnable {
 					contract = true;
 					actinReturn = false;
 				}
-				
+
 				// return myosin to relaxed state
 				objects.forEach((object) -> {
 					if (object instanceof AnimObject) {
@@ -286,7 +291,8 @@ public class Simulation implements Runnable {
 			}
 			// reset steps
 			step = 0;
-			// based on current position of myosin set current process text to the corresponding stage
+			// based on current position of myosin set current process text to the
+			// corresponding stage
 			int curFrame = ((AnimObject) objects.get(20)).getCurrentFrameInt();
 			if (!contract) {
 				textObjects.get(2).setText("Current Process: No calcium is present so actin binding sites are covered");
@@ -309,7 +315,7 @@ public class Simulation implements Runnable {
 
 			}
 		}
-		
+
 		// next few if statements update text to match values
 		if (autoPlay) {
 			textObjects.get(0).setText("AutoPlay:On");
@@ -342,7 +348,7 @@ public class Simulation implements Runnable {
 		objects.get(4).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
 		objects.get(5).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
 		objects.get(6).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
-		
+
 		// update values to match sliders
 		speed = (int) Math.round(sliderObjects.get(4).value * 5);
 		fps = (int) Math.round(sliderObjects.get(5).value * 2 + 20);
@@ -356,7 +362,7 @@ public class Simulation implements Runnable {
 		// clear window
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
-		// fix positions of hud items and viewport when window is resized 
+		// fix positions of hud items and viewport when window is resized
 		if (window.isResized()) {
 			textObjects.get(1).setPosition(window.getWidth() - 190f, window.getHeight() - 40f, 1);
 			textObjects.get(2).setPosition(10f, window.getHeight() - 60f, 1);
@@ -365,14 +371,14 @@ public class Simulation implements Runnable {
 			window.setResized(false);
 		}
 		shader.bind();
-		
+
 		// set projection matric
 		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
 				Z_NEAR, Z_FAR);
 		shader.setUniform("projectionMatrix", projectionMatrix);
 
 		shader.setUniform("texture_sampler", 0);
-		
+
 		// set view matrix
 		Matrix4f viewMatrix = transformation.getViewMatrix(camera);
 
@@ -397,49 +403,52 @@ public class Simulation implements Runnable {
 		shader.unbind();
 
 		hudShader.bind();
-		
+
 		// render hud objects with corresponding uniforms
 		Matrix4f ortho = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
-		for (Object object : textObjects) {
-			Mesh mesh = object.getMesh();
-			// Set ortohtaphic and model matrix for this HUD item
-			Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(object, ortho);
-			hudShader.setUniform("projModelMatrix", projModelMatrix);
-			hudShader.setUniform("colour", object.getMesh().getColour());
-			// Render the mesh for this HUD item
-			mesh.render();
+		for (TextObject object1 : textObjects) {
+			for (Object object : object1.getLetter()) {
+				Mesh mesh = object.getMesh();
+				// Set ortohtaphic and model matrix for this HUD item
+				Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(object, ortho);
+				hudShader.setUniform("projModelMatrix", projModelMatrix);
+				hudShader.setUniform("colour", object.getMesh().getColour());
+				// Render the mesh for this HUD item
+				mesh.render();
+			}
 		}
 		for (Slider slide : sliderObjects) {
-			Mesh mesh = slide.getPicker().getMesh();
-			// Set ortohtaphic and model matrix for this HUD item
-			Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(slide.getPicker(), ortho);
-			hudShader.setUniform("projModelMatrix", projModelMatrix);
-			hudShader.setUniform("colour", slide.getPicker().getMesh().getColour());
-			// Render the mesh for this HUD item
-			mesh.render();
-			mesh = slide.getBar().getMesh();
-			// Set ortohtaphic and model matrix for this HUD item
-			projModelMatrix = transformation.getOrtoProjModelMatrix(slide.getBar(), ortho);
-			hudShader.setUniform("projModelMatrix", projModelMatrix);
-			hudShader.setUniform("colour", slide.getBar().getMesh().getColour());
-			// Render the mesh for this HUD item
-			mesh.render();
+			for(Object object : slide.getPicker().getLetter()) {
+				Mesh mesh = object.getMesh();
+				// Set ortohtaphic and model matrix for this HUD item
+				Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(object, ortho);
+				hudShader.setUniform("projModelMatrix", projModelMatrix);
+				hudShader.setUniform("colour", object.getMesh().getColour());
+				// Render the mesh for this HUD item
+				mesh.render();
+			}
+			for(Object object : slide.getBar().getLetter()) {
+				Mesh mesh = object.getMesh();
+				// Set ortohtaphic and model matrix for this HUD item
+				Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(object, ortho);
+				hudShader.setUniform("projModelMatrix", projModelMatrix);
+				hudShader.setUniform("colour", object.getMesh().getColour());
+				// Render the mesh for this HUD item
+				mesh.render();
+			}
 		}
 
 		hudShader.unbind();
-		
+
 		// if qualitys dont match update quality to new quality
 		if (!quality.equals(q.getQuality())) {
 			q.set(quality, objects);
-			textObjects.forEach((obj) -> {
-				obj.fixText();
-			});
 		}
 
 	}
 
 	public void cleanUp() {
-		//Clean up objects from memory
+		// Clean up objects from memory
 		keyCallback.free();
 		window.cleanUp();
 		shader.cleanUp();
@@ -449,8 +458,10 @@ public class Simulation implements Runnable {
 			}
 		});
 		textObjects.forEach((object) -> {
-			for (Mesh mesh : object.getMeshes()) {
-				mesh.cleanUp();
+			for(Object obj : object.getLetter()) {
+				for (Mesh mesh : obj.getMeshes()) {
+					mesh.cleanUp();
+				}
 			}
 		});
 	}

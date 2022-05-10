@@ -4,105 +4,48 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.joml.Vector4i;
 
 import lwjglgamedev.modelLoaders.MD5Loader;
 
-public class TextObject extends Object {
-	private static final float ZPOS = 0.0f;
-
-	private static final int VERTICES_PER_QUAD = 4;
+public class TextObject {
 
 	private String text;
-
-	private final int numCols;
-
-	private final int numRows;
 	
 	private Vector4f colour = new Vector4f(1f,1f,1f,1f);
+	
+	private Vector3f position =  new Vector3f(0f,0f,1f);
+	
+	private List<LetterObject> letterObjects = new ArrayList<>();
+	
+	private float scale = 1;
+	
+	private TextMesh textMesh;
 
-	public TextObject(String text, String fontFileName, int numCols, int numRows) throws Exception {
-		super();
-		this.text = text;
-		this.numCols = numCols;
-		this.numRows = numRows;
-		Texture texture = new Texture(fontFileName);
-		this.setMeshes(new Mesh[] { buildMesh(texture, numCols, numRows)});
-	}
-
-	private Mesh buildMesh(Texture texture, int numCols, int numRows) throws Exception {
-        byte[] chars = text.getBytes(Charset.forName("ISO-8859-1"));
-        int numChars = chars.length;
-
-        List<Float> positions = new ArrayList();
-        List<Float> textCoords = new ArrayList();
-        float[] normals   = new float[0];
-        List<Integer> indices   = new ArrayList();
-
-        float tileWidth = (float)texture.getWidth() / (float)numCols;
-        float tileHeight = (float)texture.getHeight() / (float)numRows;
-        for(int i=0; i<numChars; i++) {
-            byte currChar = chars[i];
-            int col = currChar % numCols;
-            int row = currChar / numCols;
-
-            // Build a character tile composed by two triangles
-
-            // Left Top vertex
-            positions.add((float)i*tileWidth); // x
-            positions.add(0.0f); //y
-            positions.add(ZPOS); //z
-            textCoords.add((float)col / (float)numCols );
-            textCoords.add((float)row / (float)numRows );
-            indices.add(i*VERTICES_PER_QUAD);
-
-            // Left Bottom vertex
-            positions.add((float)i*tileWidth); // x
-            positions.add(tileHeight); //y
-            positions.add(ZPOS); //z
-            textCoords.add((float)col / (float)numCols );
-            textCoords.add((float)(row + 1) / (float)numRows );
-            indices.add(i*VERTICES_PER_QUAD + 1);
-
-            // Right Bottom vertex
-            positions.add((float)i*tileWidth + tileWidth); // x
-            positions.add(tileHeight); //y
-            positions.add(ZPOS); //z
-            textCoords.add((float)(col + 1)/ (float)numCols );
-            textCoords.add((float)(row + 1) / (float)numRows );
-            indices.add(i*VERTICES_PER_QUAD + 2);
-
-            // Right Top vertex
-            positions.add((float)i*tileWidth + tileWidth); // x
-            positions.add(0.0f); //y
-            positions.add(ZPOS); //z
-            textCoords.add((float)(col + 1)/ (float)numCols );
-            textCoords.add((float)row / (float)numRows );
-            indices.add(i*VERTICES_PER_QUAD + 3);
-
-            // Add indices por left top and bottom right vertices
-            indices.add(i*VERTICES_PER_QUAD);
-            indices.add(i*VERTICES_PER_QUAD + 2);
-        }
-        
-        float[] posArr = listToArray(positions);
-        float[] textCoordsArr = listToArray(textCoords);
-        int[] indicesArr = indices.stream().mapToInt(i->i).toArray();
-        Mesh mesh = new Mesh(posArr, textCoordsArr, normals, indicesArr);
-        mesh.setColour(colour.x, colour.y, colour.z, colour.w);
-        mesh.setTexture(texture);
-        return mesh;
+	public TextObject(String Text, TextMesh tmesh) throws Exception {
+		this.text = Text;
+		this.textMesh = tmesh;
+		getTextMeshes();
 	}
 	
-	public static float[] listToArray(List<Float> list) {
-        int size = list != null ? list.size() : 0;
-        float[] floatArr = new float[size];
-        for (int i = 0; i < size; i++) {
-            floatArr[i] = list.get(i);
-        }
-        return floatArr;
-    }
+	public void getTextMeshes() {
+		letterObjects = new ArrayList<>();
+		char[] chars = text.toCharArray();
+		
+		for(int i = 0; i < chars.length; i++) {
+			letterObjects.add(new LetterObject(textMesh.getMesh((int) chars[i])));
+			letterObjects.get(i).movePosition(position.x + i*19.2f, position.y, position.z);
+		}
+		
+		this.setScale(scale);
+	}
+	
+	public List<LetterObject> getLetter(){
+		return letterObjects;
+	}
+    
 	
 	public String getText() {
 	    return text;
@@ -111,18 +54,8 @@ public class TextObject extends Object {
 	public void setText(String text) {
 	    this.text = text;
 	    try {
-			this.setMeshes(new Mesh[] { buildMesh(this.getMeshes()[0].getTexture(), numCols, numRows)});
+			getTextMeshes();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public void fixText() {
-	    try {
-			this.setMeshes(new Mesh[] { buildMesh(new Texture("./textures/font.png"), numCols, numRows)});
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -146,8 +79,37 @@ public class TextObject extends Object {
 		}
 	}
 	
-	public void reset() {
-		setText(text);
+	public Vector3f getPosition() {
+		return position;
+	}
+	
+	public void setPosition(float x, float y, float z) {
+		Vector3f newPosition = new Vector3f(0,0,0);;
+		newPosition.x = x;
+		position = new Vector3f(x,y,z);
+		for(int i = 0; i < letterObjects.size(); i++) {
+			letterObjects.get(i).movePosition(x + (19.2f * i), y, z);
+		}
+	}
+	
+	public void movePosition(float x, float y, float z) {
+		position.x += x;
+		position.y += y;
+		position.z += z;
+		letterObjects.forEach((object) -> {object.movePosition(x, y, z);});
+	}
+	
+	public void setScale(float scale) {
+		this.scale = scale;
+		letterObjects.forEach((object) -> {object.setScale(scale);});
+	}
+	
+	public float getScale() {
+		return scale;
+	}
+	
+	public void fix() {
+		getTextMeshes();
 	}
 	
 	public void moveDown(float amount) {
