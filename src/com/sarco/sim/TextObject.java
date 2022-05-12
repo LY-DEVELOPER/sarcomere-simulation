@@ -13,15 +13,15 @@ import lwjglgamedev.modelLoaders.MD5Loader;
 public class TextObject {
 
 	private String text;
-	
-	private Vector4f colour = new Vector4f(1f,1f,1f,1f);
-	
-	private Vector3f position =  new Vector3f(0f,0f,1f);
-	
-	private List<LetterObject> letterObjects = new ArrayList<>();
-	
+
+	private Vector4f colour = new Vector4f(1f, 1f, 1f, 1f);
+
+	private Vector3f position = new Vector3f(0f, 0f, 1f);
+
+	private LetterObject[] letterObjects;
+
 	private float scale = 1;
-	
+
 	private TextMesh textMesh;
 
 	public TextObject(String Text, TextMesh tmesh) throws Exception {
@@ -29,37 +29,40 @@ public class TextObject {
 		this.textMesh = tmesh;
 		getTextMeshes();
 	}
-	
+
 	public void getTextMeshes() {
-		letterObjects = new ArrayList<>();
-		char[] chars = text.toCharArray();
-		
-		for(int i = 0; i < chars.length; i++) {
-			letterObjects.add(new LetterObject(textMesh.getMesh((int) chars[i])));
-			letterObjects.get(i).movePosition(position.x + i*19.2f, position.y, position.z);
+		if (letterObjects != null) {
+			for (int i = 0; i < letterObjects.length; i++) {
+				letterObjects[i].cleanUp();
+			}
 		}
-		
+		char[] chars = text.toCharArray();
+		letterObjects = new LetterObject[chars.length];
+		for (int i = 0; i < chars.length; i++) {
+			letterObjects[i] = new LetterObject(textMesh.getMesh(chars[i]));
+			letterObjects[i].movePosition(position.x + i * 19.2f, position.y, position.z);
+		}
+//		System.out.println(letterObjects.size());
 		this.setScale(scale);
 	}
-	
-	public List<LetterObject> getLetter(){
+
+	public LetterObject[] getLetter() {
 		return letterObjects;
 	}
-    
-	
+
 	public String getText() {
-	    return text;
+		return text;
 	}
 
 	public void setText(String text) {
-	    this.text = text;
-	    try {
+		this.text = text;
+		try {
 			getTextMeshes();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public Vector4i getBorders() {
 		int x1, x2, y1, y2;
 		int size = this.text.length();
@@ -68,42 +71,47 @@ public class TextObject {
 		x2 = x1 + width;
 		y1 = (int) this.getPosition().y;
 		y2 = y1 + Math.round(128 * this.getScale());
-		return(new Vector4i(x1, x2, y1, y2));
+		return (new Vector4i(x1, x2, y1, y2));
 	}
-	
+
 	public void toggleVis() {
-		if(this.getPosition().x > 0) {
+		if (this.getPosition().x > 0) {
 			this.movePosition(-10000, 0, 0);
-		}else {
+		} else {
 			this.movePosition(10000, 0, 0);
 		}
 	}
-	
+
 	public Vector3f getPosition() {
 		return position;
 	}
-	
+
 	public void setPosition(float x, float y, float z) {
-		Vector3f newPosition = new Vector3f(0,0,0);;
+		Vector3f newPosition = new Vector3f(0, 0, 0);
+		;
 		newPosition.x = x;
-		position = new Vector3f(x,y,z);
-		for(int i = 0; i < letterObjects.size(); i++) {
-			letterObjects.get(i).movePosition(x + (19.2f * i), y, z);
+		position = new Vector3f(x, y, z);
+		for (int i = 0; i < letterObjects.length; i++) {
+			letterObjects[i].movePosition(x + (19.2f * i), y, z);
 		}
 	}
-	
+
 	public void movePosition(float x, float y, float z) {
 		position.x += x;
 		position.y += y;
 		position.z += z;
-		letterObjects.forEach((object) -> {object.movePosition(x, y, z);});
+		for (int i = 0; i < letterObjects.length; i++) {
+			letterObjects[i].movePosition(x, y, z);
+		}
 	}
-	
+
 	public void setScale(float scale) {
 		this.scale = scale;
-		letterObjects.forEach((object) -> {object.setScale(scale);});
+		for (int i = 0; i < letterObjects.length; i++) {
+			letterObjects[i].setScale(scale);
+		}
 	}
-	
+
 	public float getScale() {
 		return scale;
 	}
@@ -111,16 +119,17 @@ public class TextObject {
 	public void fix() {
 		getTextMeshes();
 	}
-	
+
 	public void moveDown(float amount) {
 		this.movePosition(0, amount * 30, 0);
 	}
-	
+
 	public boolean isMouseOver(double x, double y) {
 		Vector4i border = this.getBorders();
-		if(x > border.x && x < border.y && y > border.z && y < border.w) {
+		if (x > border.x && x < border.y && y > border.z && y < border.w) {
 			return true;
 		}
 		return false;
 	}
+
 }

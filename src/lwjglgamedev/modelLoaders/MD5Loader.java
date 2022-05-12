@@ -8,7 +8,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import com.sarco.sim.AnimObject;
+import com.sarco.sim.AnimatedObject;
 import com.sarco.sim.Mesh;
 import com.sarco.sim.Texture;
 
@@ -18,7 +18,8 @@ public class MD5Loader {
 	 * Changes made by Louis Yung, changed AnimGameItem to AnimObject and removed
 	 * the default colour from the constructor, Imported my mesh and texture
 	 * classes, Removed refrences to material and default colour in handleTexture
-	 * function
+	 * function, also removed joint mats from animated object.
+	 * changed mesh.MAX_WEIGHTS to 4
 	 */
 
 	/**
@@ -30,7 +31,7 @@ public class MD5Loader {
 	 * @return
 	 * @throws Exception
 	 */
-	public static AnimObject process(MD5Model md5Model, MD5AnimModel animModel) throws Exception {
+	public static AnimatedObject process(MD5Model md5Model, MD5AnimModel animModel) throws Exception {
 		List<Matrix4f> invJointMatrices = calcInJointMatrices(md5Model);
 		List<AnimatedFrame> animatedFrames = processAnimationFrames(md5Model, animModel, invJointMatrices);
 
@@ -44,7 +45,7 @@ public class MD5Loader {
 		Mesh[] meshes = new Mesh[list.size()];
 		meshes = list.toArray(meshes);
 
-		AnimObject result = new AnimObject(meshes, animatedFrames, invJointMatrices);
+		AnimatedObject result = new AnimatedObject(meshes[0], animatedFrames);
 		return result;
 	}
 
@@ -217,7 +218,7 @@ public class MD5Loader {
 			normals.add(vertex.normal.z);
 
 			int numWeights = vertex.weights.length;
-			for (int i = 0; i < Mesh.MAX_WEIGHTS; i++) {
+			for (int i = 0; i < 4; i++) {
 				if (i < numWeights) {
 					jointIndices.add(vertex.jointIndices[i]);
 					weights.add(vertex.weights[i]);

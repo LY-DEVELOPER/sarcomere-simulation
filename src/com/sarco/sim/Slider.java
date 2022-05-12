@@ -20,8 +20,9 @@ public class Slider {
 		bar.setScale(0.3f);
 		picker.setPosition(position.x + (192 * (value / 100)) + (0.3f*64), position.y, position.z);
 		picker.setScale(0.3f);
-		bar.fix();
+		
 		picker.fix();
+		bar.fix();
 	}
 
 	public Slider(String id, Vector3f position, TextMesh meshes) throws Exception {
@@ -35,16 +36,16 @@ public class Slider {
 	
 	public void pickerClick(int x) {
 		if (value >= 0 && value <= 100) {
-			picker.getPosition().x = x -9;
+			picker.movePosition(x - 9, x, x);
 			value = Math.round(((x - bar.getPosition().x) + (0.3f*-64 - 9)) / 1.92); 
 		}
 		if(value < 0) {
 			value = 0f;
-			picker.getPosition().x = bar.getPosition().x + (0.3f*64);
+			picker.movePosition(bar.getPosition().x + (0.3f*64), x, x);
 		}
 		if(value > 100) {
 			value = 100f;
-			picker.getPosition().x = bar.getPosition().x + 192 + (0.3f*64);
+			picker.movePosition(bar.getPosition().x + 192 + (0.3f*64), x, x);
 		}
 	}
 	

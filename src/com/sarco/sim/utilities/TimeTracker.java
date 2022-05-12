@@ -3,6 +3,7 @@ package com.sarco.sim.utilities;
 public class TimeTracker {
 	
 	double lastLoop;
+	double timeStarted;
     
 	public double getSystemTime() {
 	    return System.nanoTime() / 1000000000.0;
@@ -10,6 +11,7 @@ public class TimeTracker {
 
 	public TimeTracker() {
 	    lastLoop = getSystemTime();
+	    timeStarted = getSystemTime();
 	}
 	
 	public float getTimeSince() {
@@ -21,6 +23,10 @@ public class TimeTracker {
 	
 	public double getLastLoop() {
 		return lastLoop;
+	}
+	
+	public double getTimeElapsed() {
+		return getSystemTime() - timeStarted;
 	}
 }
 

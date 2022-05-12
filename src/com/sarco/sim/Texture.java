@@ -32,39 +32,24 @@ public class Texture {
 		return id;
 	}
 
-	private static int loadTexture(String fileName) throws Exception {
+	private static int loadTexture(String file) throws Exception {
 		ByteBuffer buf;
-		// Load Texture file
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			IntBuffer w = stack.mallocInt(1);
 			IntBuffer h = stack.mallocInt(1);
 			IntBuffer channels = stack.mallocInt(1);
 			
-			buf = stbi_load(fileName, w, h, channels, 4);
-			
-			if (buf == null) {
-				throw new Exception("Image file [" + fileName + "] not loaded: " + stbi_failure_reason());
-			}
-
-			/* Get width and height of image */
+			buf = stbi_load(file, w, h, channels, 4);
 			width = w.get();
 			height = h.get();
 		}
 
-		// Create a new OpenGL texture
 		int textureId = glGenTextures();
-		// Bind the texture
 		glBindTexture(GL_TEXTURE_2D, textureId);
-
-		// Tell OpenGL how to unpack the RGBA bytes. Each component is 1 byte size
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-		 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		// Upload the texture data
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-		// Generate Mip Map
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		stbi_image_free(buf);
@@ -77,12 +62,10 @@ public class Texture {
 	}
 
 	public int getWidth() {
-		// TODO Auto-generated method stub
 		return width;
 	}
 
 	public int getHeight() {
-		// TODO Auto-generated method stub
 		return height;
 	}
 }

@@ -8,6 +8,10 @@ import org.joml.Vector3f;
 import com.sarco.sim.Mesh;
 
 public class OBJLoader {
+	
+	/*
+	 * Changes made by Louis Yung, made mesh construct with null and null at end
+	 */
 
     public static Mesh loadMesh(String fileName) throws Exception {
         List<String> lines = Utils.readAllLines(fileName);
@@ -79,7 +83,7 @@ public class OBJLoader {
             }
         }
         int[] indicesArr = Utils.listIntToArray(indices);
-        Mesh mesh = new Mesh(posArr, textCoordArr, normArr, indicesArr);
+        Mesh mesh = new Mesh(posArr, textCoordArr, normArr, indicesArr, null, null);
         return mesh;
     }
 

@@ -5,30 +5,18 @@ import org.joml.Vector4f;
 
 public class Object {
 
-	private Mesh[] meshes;
+	protected Mesh mesh;
 
-	private final Vector3f position;
+	private final Vector3f position = new Vector3f(0, 0, 0);;
 
-	private float scale;
+	private float scale = 1;
 
-	private final Vector3f rotation;
-
-	public Object() {
-		position = new Vector3f(0, 0, 0);
-		scale = 1;
-		rotation = new Vector3f(0, 0, 0);
-	}
+	private final Vector3f rotation = new Vector3f(0, 0, 0);;
 
 	public Object(Mesh mesh) {
-		this();
-		this.meshes = new Mesh[] { mesh };
+		this.mesh = mesh;
 	}
-
-	public Object(Mesh[] meshes) {
-		this();
-		this.meshes = meshes;
-	}
-
+	
 	public Vector3f getPosition() {
 		return position;
 	}
@@ -74,30 +62,18 @@ public class Object {
 		rotation.y += offsetY;
 		rotation.z += offsetZ;
 	}
-
+	
 	public Mesh getMesh() {
-		return meshes[0];
-	}
-
-	public Mesh[] getMeshes() {
-		return meshes;
-	}
-
-	public void setMeshes(Mesh[] meshes) {
-		if(this.getMeshes() != null) {
-		for(Mesh m : this.getMeshes()) {
-			m.deleteBuffers();
-		}
-		}
-		this.meshes = meshes;
+		return mesh;
 	}
 
 	public void setMesh(Mesh mesh) {
-		for(Mesh m : this.getMeshes()) {
-			m.deleteBuffers();
+		if(this.getMesh() != null) {
+			mesh.deleteBuffers();
 		}
-		this.meshes = new Mesh[] { mesh };
+		this.mesh = mesh;
 	}
+
     public void setR(float x) {
     	Vector4f i = this.getMesh().getColour();
     	this.getMesh().setColour(x, i.y, i.z, i.w);

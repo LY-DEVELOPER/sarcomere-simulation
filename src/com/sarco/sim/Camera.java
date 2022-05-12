@@ -4,22 +4,22 @@ import org.joml.Vector3f;
 
 public class Camera {
 
-	private final Vector3f position;
-
-	private final Vector3f rotation;
-
+	private Vector3f position;
+	private Vector3f rotation;
 	private float scale;
 
 	public Camera() {
 		position = new Vector3f(0, 0, 2);
 		rotation = new Vector3f(0, 0, 0);
 		scale = 1;
-
 	}
 
-	public Camera(Vector3f position, Vector3f rotation) {
-		this.position = position;
-		this.rotation = rotation;
+	public float getScale() {
+		return scale;
+	}
+
+	public void setScale(float scale) {
+		this.scale = scale;
 	}
 
 	public Vector3f getPosition() {
@@ -27,15 +27,11 @@ public class Camera {
 	}
 
 	public void setPosition(float x, float y, float z) {
-		position.x = x;
-		position.y = y;
-		position.z = z;
+		position = new Vector3f(x, y, z);
 	}
 
-	public void movePosition(float offsetX, float offsetY, float offsetZ) {
-		position.z += offsetZ;
-		position.x += offsetX;
-		position.y += offsetY;
+	public void movePosition(float x, float y, float z) {
+		position.add(new Vector3f(x, y, z));
 	}
 
 	public Vector3f getRotation() {
@@ -43,22 +39,11 @@ public class Camera {
 	}
 
 	public void setRotation(float x, float y, float z) {
-		rotation.x = x;
-		rotation.y = y;
-		rotation.z = z;
+		rotation = new Vector3f(x, y, z);
 	}
 
-	public void moveRotation(float offsetX, float offsetY, float offsetZ) {
-		rotation.x += offsetX;
-		rotation.y += offsetY;
-		rotation.z += offsetZ;
-	}
-
-	public float getScale() {
-		return scale;
-	}
-	public void setScale(float scale) {
-		this.scale = scale;
+	public void moveRotation(float x, float y, float z) {
+		rotation.add(new Vector3f(x, y, z));
 	}
 
 	public void camZoom(float zoom) {
@@ -71,4 +56,5 @@ public class Camera {
 			position.z = 0.1f;
 		}
 	}
+
 }

@@ -67,21 +67,27 @@ public class Simulation implements Runnable {
 	}
 
 	public void init() throws Exception {
+		//intilialising classes
 		window = new Window();
 		timer = new TimeTracker();
 		transformation = new Transformations();
 		window.init(vsync);
 		shader = new ShaderProgram();
 		camera = new Camera();
-		textMesh =  new TextMesh();
+		textMesh = new TextMesh();
 		q = new Quality();
+		
+		//Adding input callbacks
 		glfwSetKeyCallback(window.getWindow(), keyCallback);
 		glfwSetScrollCallback(window.getWindow(), scrollCallback);
 		glfwSetCursorPosCallback(window.getWindow(), cursorCallback);
 		glfwSetMouseButtonCallback(window.getWindow(), mouseCallback);
+		
+		//adding shaders to shaderprogram
 		shader.createVertexShader(LoadShader.load("/assets/vertex.vs"));
 		shader.createFragmentShader(LoadShader.load("/assets/fragment.fs"));
 		shader.link();
+		
 		// Creating uniforms for the shaders
 		shader.createUniform("projectionMatrix");
 		shader.createUniform("modelViewMatrix");
@@ -89,18 +95,24 @@ public class Simulation implements Runnable {
 		shader.createUniform("colour");
 		shader.createUniform("useColour");
 		shader.createUniform("jointsMatrix");
+		
+		// add the shaders programs
 		hudShader = new ShaderProgram();
 		hudShader.createVertexShader(LoadShader.load("/assets/hud_vertex.vs"));
-		hudShader.createFragmentShader(LoadShader.load("/assets/hud_fragment.fs"));
+		hudShader.createFragmentShader(LoadShader.load("/assets/fragment.fs"));
 		hudShader.link();
 		hudShader.createUniform("projModelMatrix");
 		hudShader.createUniform("colour");
+		
+		//setting up camera position
 		camera.setRotation(10, 20, 0);
 		camera.setPosition(0, 0, 3);
 		camera.setScale(0.2f);
-
+		
+		//Calling class that intilises 3D objects
 		objects = CreateSceneObjects.gen();
 		
+		//Initialising arrays for the ui objects
 		textObjects = new ArrayList<TextObject>();
 		sliderObjects = new ArrayList<Slider>();
 
@@ -165,11 +177,15 @@ public class Simulation implements Runnable {
 		// setting all the text objects to the same scale
 		for (TextObject obj : textObjects) {
 			obj.setScale(0.3f);
-			obj.fix();
 		}
 		// making specific text objects invisible
 		for (int i = 8; i < textObjects.size(); i++) {
 			textObjects.get(i).toggleVis();
+		}
+		
+		//This fixes a problem where text needs to be set twice before it shows
+		for (int i = 0; i < textObjects.size(); i++) {
+			textObjects.get(i).fix();
 		}
 
 		// making slider objects invisible
@@ -188,9 +204,10 @@ public class Simulation implements Runnable {
 		// while the window is open keep the game loop running
 		while (!window.shouldClose()) {
 			timeSince = timer.getTimeSince();
-			// add fps to average
+			// add FPS to average
 			averageFPS.add(Math.round(1 / timeSince));
-			// set the live fps to the average of 10 fps
+
+			// gets the average of 10 frames
 			if (averageFPS.size() >= 10) {
 				int total = 0;
 				for (Integer i : averageFPS) {
@@ -211,7 +228,7 @@ public class Simulation implements Runnable {
 	}
 
 	public void wait(int ms) {
-		// make the program sleep for as many miliseconds as required to match fps
+		// make the program sleep for as many milliseconds as required to match FPS
 		float waitTime = 1f / fps;
 		double endTime = timer.getLastLoop() + waitTime;
 		while (timer.getSystemTime() < endTime) {
@@ -238,11 +255,11 @@ public class Simulation implements Runnable {
 			// if contracting play animation and move actin
 			if (objects.get(3).getPosition().x > 0.3 && !actinReturn && contract) {
 				objects.forEach((object) -> {
-					if (object instanceof AnimObject) {
-						((AnimObject) object).nextFrame(stepInt);
-						int frame = ((AnimObject) object).getCurrentFrameInt();
+					if (object instanceof AnimatedObject) {
+						((AnimatedObject) object).nextFrame(stepInt);
+						int frame = ((AnimatedObject) object).getFrameInt();
 						if (frame >= 32 && frame <= 64) {
-							moveActin();
+							moveActin = true;
 						}
 					}
 				});
@@ -257,9 +274,9 @@ public class Simulation implements Runnable {
 				// if not contracting and not returning set myosin to releaxed state
 			} else if (!actinReturn && !contract) {
 				objects.forEach((object) -> {
-					if (object instanceof AnimObject) {
-						((AnimObject) object).nextFrame(stepInt);
-						int frame = ((AnimObject) object).getCurrentFrameInt();
+					if (object instanceof AnimatedObject) {
+						((AnimatedObject) object).nextFrame(stepInt);
+						int frame = ((AnimatedObject) object).getFrameInt();
 						if (frame <= 16 || frame >= 128) {
 							actinReturn = true;
 						}
@@ -281,10 +298,10 @@ public class Simulation implements Runnable {
 
 				// return myosin to relaxed state
 				objects.forEach((object) -> {
-					if (object instanceof AnimObject) {
-						int frame = ((AnimObject) object).getCurrentFrameInt();
+					if (object instanceof AnimatedObject) {
+						int frame = ((AnimatedObject) object).getFrameInt();
 						if (frame > 0) {
-							((AnimObject) object).nextFrame(-stepInt);
+							((AnimatedObject) object).nextFrame(-stepInt);
 						}
 					}
 				});
@@ -293,7 +310,7 @@ public class Simulation implements Runnable {
 			step = 0;
 			// based on current position of myosin set current process text to the
 			// corresponding stage
-			int curFrame = ((AnimObject) objects.get(20)).getCurrentFrameInt();
+			int curFrame = ((AnimatedObject) objects.get(20)).getFrameInt();
 			if (!contract) {
 				textObjects.get(2).setText("Current Process: No calcium is present so actin binding sites are covered");
 			} else {
@@ -312,7 +329,6 @@ public class Simulation implements Runnable {
 				if (curFrame >= 110 && curFrame < 128) {
 					textObjects.get(2).setText("Current Process: ATP breaks down into ADP + P");
 				}
-
 			}
 		}
 
@@ -336,7 +352,7 @@ public class Simulation implements Runnable {
 
 		// update object colours to match sliders
 		for (Object object : objects) {
-			if (object instanceof AnimObject) {
+			if (object instanceof AnimatedObject) {
 				Vector3f i = valueToColour(sliderObjects.get(0).value);
 				int j = (int) sliderObjects.get(1).value;
 				object.getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
@@ -354,10 +370,6 @@ public class Simulation implements Runnable {
 		fps = (int) Math.round(sliderObjects.get(5).value * 2 + 20);
 	}
 
-	public void moveActin() {
-		moveActin = true;
-	}
-
 	public void render() throws Exception {
 		// clear window
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -372,7 +384,7 @@ public class Simulation implements Runnable {
 		}
 		shader.bind();
 
-		// set projection matric
+		// set projection matrices
 		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
 				Z_NEAR, Z_FAR);
 		shader.setUniform("projectionMatrix", projectionMatrix);
@@ -384,21 +396,20 @@ public class Simulation implements Runnable {
 
 		// render objects with corresponding uniforms
 		for (Object object : objects) {
-
+			
+			// set transformation matrix
 			Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(object, viewMatrix);
 			shader.setUniform("modelViewMatrix", modelViewMatrix);
 			shader.setUniform("colour", object.getMesh().getColour());
 			shader.setUniform("useColour", object.getMesh().isTextured() ? 0 : 1);
 
-			if (object instanceof AnimObject) {
-				AnimObject animObject = (AnimObject) object;
-				AnimatedFrame frame = animObject.getCurrentFrame();
+			if (object instanceof AnimatedObject) {
+				AnimatedObject animObject = (AnimatedObject) object;
+				AnimatedFrame frame = animObject.getFrame();
 				shader.setUniform("jointsMatrix", frame.getJointMatrices());
 			}
 
-			for (Mesh mesh : object.getMeshes()) {
-				mesh.render();
-			}
+			object.getMesh().render();
 		}
 		shader.unbind();
 
@@ -418,7 +429,7 @@ public class Simulation implements Runnable {
 			}
 		}
 		for (Slider slide : sliderObjects) {
-			for(Object object : slide.getPicker().getLetter()) {
+			for (Object object : slide.getPicker().getLetter()) {
 				Mesh mesh = object.getMesh();
 				// Set ortohtaphic and model matrix for this HUD item
 				Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(object, ortho);
@@ -427,7 +438,7 @@ public class Simulation implements Runnable {
 				// Render the mesh for this HUD item
 				mesh.render();
 			}
-			for(Object object : slide.getBar().getLetter()) {
+			for (Object object : slide.getBar().getLetter()) {
 				Mesh mesh = object.getMesh();
 				// Set ortohtaphic and model matrix for this HUD item
 				Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(object, ortho);
@@ -453,14 +464,12 @@ public class Simulation implements Runnable {
 		window.cleanUp();
 		shader.cleanUp();
 		objects.forEach((object) -> {
-			for (Mesh mesh : object.getMeshes()) {
-				mesh.cleanUp();
-			}
+				object.getMesh().cleanUp();
 		});
 		textObjects.forEach((object) -> {
-			for(Object obj : object.getLetter()) {
-				for (Mesh mesh : obj.getMeshes()) {
-					mesh.cleanUp();
+			for (Object obj : object.getLetter()) {
+				if (obj.getMesh() != null) {
+					obj.getMesh().cleanUp();
 				}
 			}
 		});

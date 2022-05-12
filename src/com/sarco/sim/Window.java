@@ -45,7 +45,7 @@ public class Window {
 		// TODO Auto-generated method stub
 		glfwSetErrorCallback(errorCallback);
 		if (!glfwInit()) {
-			throw new IllegalStateException("Unable to initialize GLFW");
+			throw new IllegalStateException("GLFW Failed");
 		}
 		glfwDefaultWindowHints();
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
@@ -67,9 +67,9 @@ public class Window {
 			this.setResized(true);
 		});
 
-		// Get the resolution of the primary monitor
+		// Get primary monitor
 		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		// Center our window
+		// Centre window
 		glfwSetWindowPos(window, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
 
 		glfwMakeContextCurrent(window);
@@ -132,12 +132,10 @@ public class Window {
 	}
 
 	public boolean isResized() {
-		// TODO Auto-generated method stub
 		return resized;
 	}
 
 	public void setResized(boolean r) {
-		// TODO Auto-generated method stub
 		resized = r;
 	}
 

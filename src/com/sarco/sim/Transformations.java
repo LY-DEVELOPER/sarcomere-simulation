@@ -48,8 +48,6 @@ public class Transformations {
         viewMatrix.rotate((float)Math.toRadians(rotation.x), new Vector3f(1, 0, 0)).rotate((float)Math.toRadians(rotation.y), new Vector3f(0, 1, 0));
         viewMatrix.translate(-cameraPos.x, -cameraPos.y, 0);
         viewMatrix.scale(camera.getScale());
-        // First do the rotation so camera rotates over its position
-        // Then do the translation
         return viewMatrix;
     }
     

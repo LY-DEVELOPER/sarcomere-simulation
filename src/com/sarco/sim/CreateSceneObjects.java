@@ -42,7 +42,7 @@ public class CreateSceneObjects {
 		objects.get(6).setRotation(0, 180, 0);
 		objects.get(6).setPosition(-5, -0.38f, 0);
 		for (int i = 0; i < 135; i+=3) {
-			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
+			AnimatedObject myosinObj = MD5Loader.process(myosin, animMyo);
 			myosinObj.setRotation(118.8f + (i/3) * 36, 0, 0);
 			myosinObj.setPosition(0 - (i/3) * 0.143f, 0, 0);
 			objects.add(myosinObj);
@@ -56,7 +56,7 @@ public class CreateSceneObjects {
 			objects.add(myosinObj);
 		}
 		for (int i = 0; i < 135; i+=3) {
-			AnimObject myosinObj = MD5Loader.process(myosin, animMyo);
+			AnimatedObject myosinObj = MD5Loader.process(myosin, animMyo);
 			myosinObj.setRotation(118.8f - (i/3) * 36, 180, 0);
 			myosinObj.setPosition(0 + (i/3) * 0.143f, 0, 0);
 			objects.add(myosinObj);

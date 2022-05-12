@@ -8,8 +8,6 @@ import org.joml.Vector4f;
 
 public class TextMesh {
 	private static final float ZPOS = 0.0f;
-
-	private static final int VERTICES_PER_QUAD = 4;
 	
 	private Vector4f colour = new Vector4f(1,1,1,1);
 	
@@ -53,53 +51,46 @@ public class TextMesh {
 			int col = currChar % numCols;
 			int row = currChar / numCols;
 			
-			List<Float> positions = new ArrayList();
-			List<Float> textCoords = new ArrayList();
+			List<Float> positions = new ArrayList<Float>();
+			List<Float> textCoords = new ArrayList<Float>();
 			float[] normals = new float[0];
-			List<Integer> indices = new ArrayList();
+			List<Integer> indices = new ArrayList<Integer>();
 
-			// Build a character tile composed by two triangles
-
-			// Left Top vertex
-			positions.add(0.0f); // x
-			positions.add(0.0f); // y
-			positions.add(ZPOS); // z
+			positions.add(0.0f);
+			positions.add(0.0f);
+			positions.add(ZPOS);
 			textCoords.add((float) col / (float) numCols);
 			textCoords.add((float) row / (float) numRows);
 			indices.add(0);
 
-			// Left Bottom vertex
-			positions.add(0.0f); // x
-			positions.add(tileHeight); // y
-			positions.add(ZPOS); // z
+			positions.add(0.0f);
+			positions.add(tileHeight);
+			positions.add(ZPOS);
 			textCoords.add((float) col / (float) numCols);
 			textCoords.add((float) (row + 1) / (float) numRows);
 			indices.add(1);
 
-			// Right Bottom vertex
-			positions.add(tileWidth); // x
-			positions.add(tileHeight); // y
-			positions.add(ZPOS); // z
+			positions.add(tileWidth);
+			positions.add(tileHeight);
+			positions.add(ZPOS);
 			textCoords.add((float) (col + 1) / (float) numCols);
 			textCoords.add((float) (row + 1) / (float) numRows);
 			indices.add(2);
 
-			// Right Top vertex
-			positions.add(tileWidth); // x
-			positions.add(0.0f); // y
-			positions.add(ZPOS); // z
+			positions.add(tileWidth);
+			positions.add(0.0f);
+			positions.add(ZPOS);
 			textCoords.add((float) (col + 1) / (float) numCols);
 			textCoords.add((float) row / (float) numRows);
 			indices.add(3);
 
-			// Add indices por left top and bottom right vertices
 			indices.add(0);
 			indices.add(2);
 			
 			float[] posArr = listToArray(positions);
 			float[] textCoordsArr = listToArray(textCoords);
 			int[] indicesArr = indices.stream().mapToInt(i -> i).toArray();
-			Mesh mesh = new Mesh(posArr, textCoordsArr, normals, indicesArr);
+			Mesh mesh = new Mesh(posArr, textCoordsArr, normals, indicesArr, null, null);
 			mesh.setColour(colour.x, colour.y, colour.z, colour.w);
 			mesh.setTexture(texture);
 			tempMeshes.add(mesh);
