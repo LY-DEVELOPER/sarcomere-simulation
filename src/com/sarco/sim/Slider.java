@@ -36,16 +36,16 @@ public class Slider {
 	
 	public void pickerClick(int x) {
 		if (value >= 0 && value <= 100) {
-			picker.movePosition(x - 9, x, x);
+			picker.setPosition(x - 9, picker.getPosition().y, picker.getPosition().z);
 			value = Math.round(((x - bar.getPosition().x) + (0.3f*-64 - 9)) / 1.92); 
 		}
 		if(value < 0) {
 			value = 0f;
-			picker.movePosition(bar.getPosition().x + (0.3f*64), x, x);
+			picker.setPosition(bar.getPosition().x + (0.3f*64), picker.getPosition().y, picker.getPosition().z);
 		}
 		if(value > 100) {
 			value = 100f;
-			picker.movePosition(bar.getPosition().x + 192 + (0.3f*64), x, x);
+			picker.setPosition(bar.getPosition().x + 192 + (0.3f*64), picker.getPosition().y, picker.getPosition().z);
 		}
 	}
 	

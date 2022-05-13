@@ -14,9 +14,9 @@ public class ShaderProgram {
 
     private final int programId;
 
-    private int vertexShaderId;
+    private int vShader;
 
-    private int fragmentShaderId;
+    private int fShader;
 
     private final Map<String, Integer> uniforms;
 
@@ -58,11 +58,11 @@ public class ShaderProgram {
     }
 
     public void createVertexShader(String shaderCode) throws Exception {
-        vertexShaderId = createShader(shaderCode, GL_VERTEX_SHADER);
+        vShader = createShader(shaderCode, GL_VERTEX_SHADER);
     }
 
     public void createFragmentShader(String shaderCode) throws Exception {
-        fragmentShaderId = createShader(shaderCode, GL_FRAGMENT_SHADER);
+        fShader = createShader(shaderCode, GL_FRAGMENT_SHADER);
     }
 
     protected int createShader(String shaderCode, int shaderType) throws Exception {
@@ -76,8 +76,8 @@ public class ShaderProgram {
 
     public void link() throws Exception {
         glLinkProgram(programId);
-        glDetachShader(programId, vertexShaderId);
-        glDetachShader(programId, fragmentShaderId);
+        glDetachShader(programId, vShader);
+        glDetachShader(programId, fShader);
         glValidateProgram(programId);
     }
 

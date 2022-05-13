@@ -11,6 +11,8 @@ public class CreateSceneObjects {
 
 	
 	public static ArrayList<Object> gen() throws Exception {
+		
+		//Initialise the meshes
 		ArrayList<Object> objects = new ArrayList<Object>();
 		Mesh skyBox = OBJLoader.loadMesh("/assets/skybox.obj");
 		skyBox.setColour(0.5f, 0.5f, 0.5f, 1);
@@ -24,6 +26,8 @@ public class CreateSceneObjects {
 		actin.setColour(0, 0.58f, 1f, 1);
 		MD5Model myosin = MD5Model.parse("/assets/mediummyosin.md5mesh");
 		MD5AnimModel animMyo = MD5AnimModel.parse("/assets/myosin.md5anim");
+		
+		//Initialise the objs
 		objects.add(new Object(skyBox));
 		objects.get(0).setScale(20f);
 		objects.add(new Object(grid));
@@ -41,6 +45,8 @@ public class CreateSceneObjects {
 		objects.add(new Object(actin));
 		objects.get(6).setRotation(0, 180, 0);
 		objects.get(6).setPosition(-5, -0.38f, 0);
+		
+		// Initialise and place the myosin in a 3 helical structure
 		for (int i = 0; i < 135; i+=3) {
 			AnimatedObject myosinObj = MD5Loader.process(myosin, animMyo);
 			myosinObj.setRotation(118.8f + (i/3) * 36, 0, 0);

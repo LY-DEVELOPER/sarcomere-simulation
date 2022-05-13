@@ -4,15 +4,9 @@ import org.joml.Vector3f;
 
 public class Camera {
 
-	private Vector3f position;
-	private Vector3f rotation;
-	private float scale;
-
-	public Camera() {
-		position = new Vector3f(0, 0, 2);
-		rotation = new Vector3f(0, 0, 0);
-		scale = 1;
-	}
+	private Vector3f position = new Vector3f(0, 0, 2);
+	private Vector3f rotation = new Vector3f(0, 0, 0);
+	private float scale = 1;
 
 	public float getScale() {
 		return scale;
@@ -45,8 +39,9 @@ public class Camera {
 	public void moveRotation(float x, float y, float z) {
 		rotation.add(new Vector3f(x, y, z));
 	}
-
+	
 	public void camZoom(float zoom) {
+		// Moves the cameras z between 5 and 0.1
 		zoom *= -1;
 		zoom *= position.z;
 		this.position.z += zoom;

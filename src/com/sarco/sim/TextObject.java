@@ -88,11 +88,12 @@ public class TextObject {
 
 	public void setPosition(float x, float y, float z) {
 		Vector3f newPosition = new Vector3f(0, 0, 0);
-		;
 		newPosition.x = x;
+		newPosition.y = y;
+		newPosition.z = z;
 		position = new Vector3f(x, y, z);
 		for (int i = 0; i < letterObjects.length; i++) {
-			letterObjects[i].movePosition(x + (19.2f * i), y, z);
+			letterObjects[i].setPosition(x + (i*19.2f), y, z);
 		}
 	}
 

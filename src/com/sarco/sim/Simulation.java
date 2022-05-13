@@ -35,7 +35,7 @@ public class Simulation implements Runnable {
 	int fps = 100;
 	float step = 0;
 	int liveFPS;
-	String quality = "Medium";
+	String quality = "Low";
 
 	private static final float FOV = (float) Math.toRadians(60.0f);
 
@@ -72,7 +72,6 @@ public class Simulation implements Runnable {
 		timer = new TimeTracker();
 		transformation = new Transformations();
 		window.init(vsync);
-		shader = new ShaderProgram();
 		camera = new Camera();
 		textMesh = new TextMesh();
 		q = new Quality();
@@ -84,6 +83,7 @@ public class Simulation implements Runnable {
 		glfwSetMouseButtonCallback(window.getWindow(), mouseCallback);
 		
 		//adding shaders to shaderprogram
+		shader = new ShaderProgram();
 		shader.createVertexShader(LoadShader.load("/assets/vertex.vs"));
 		shader.createFragmentShader(LoadShader.load("/assets/fragment.fs"));
 		shader.link();
@@ -101,6 +101,7 @@ public class Simulation implements Runnable {
 		hudShader.createVertexShader(LoadShader.load("/assets/hud_vertex.vs"));
 		hudShader.createFragmentShader(LoadShader.load("/assets/fragment.fs"));
 		hudShader.link();
+		
 		hudShader.createUniform("projModelMatrix");
 		hudShader.createUniform("colour");
 		
