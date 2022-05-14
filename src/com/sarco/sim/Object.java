@@ -72,7 +72,7 @@ public class Object {
 	public void setMesh(Mesh mesh) {
 		//Delete old mesh
 		if(this.getMesh() != null) {
-			this.mesh.cleanUp();
+			this.mesh.delete();
 		}
 		this.mesh = mesh;
 	}

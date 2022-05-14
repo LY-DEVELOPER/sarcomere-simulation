@@ -7,7 +7,6 @@ import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
@@ -15,7 +14,6 @@ import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
-import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.stb.STBImage.*;
@@ -109,7 +107,7 @@ public class Window {
 		glfwPollEvents();
 	}
 
-	public void cleanUp() {
+	public void delete() {
 		glfwDestroyWindow(window);
 		glfwTerminate();
 		errorCallback.free();

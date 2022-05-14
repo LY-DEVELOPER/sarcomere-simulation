@@ -1,20 +1,11 @@
 package com.sarco.sim;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.joml.Vector4i;
-
-import lwjglgamedev.modelLoaders.MD5Loader;
 
 public class TextObject {
 
 	private String text;
-
-	private Vector4f colour = new Vector4f(1f, 1f, 1f, 1f);
 
 	private Vector3f position = new Vector3f(0f, 0f, 1f);
 
@@ -33,7 +24,7 @@ public class TextObject {
 	public void getTextMeshes() {
 		if (letterObjects != null) {
 			for (int i = 0; i < letterObjects.length; i++) {
-				letterObjects[i].cleanUp();
+				letterObjects[i].delete();
 			}
 		}
 		char[] chars = text.toCharArray();

@@ -2,8 +2,6 @@ package com.sarco.sim;
 
 import java.util.ArrayList;
 
-import org.joml.Vector3f;
-
 import lwjglgamedev.modelLoaders.MD5AnimModel;
 import lwjglgamedev.modelLoaders.MD5Loader;
 import lwjglgamedev.modelLoaders.MD5Model;

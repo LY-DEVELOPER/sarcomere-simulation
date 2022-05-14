@@ -1,7 +1,6 @@
 package com.sarco.sim;
 
 import org.joml.Vector3f;
-import org.joml.Vector3i;
 
 public class Slider {
 	String id;

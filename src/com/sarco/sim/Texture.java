@@ -24,10 +24,6 @@ public class Texture {
 		this.id = id;
 	}
 
-	public void bind() {
-		glBindTexture(GL_TEXTURE_2D, id);
-	}
-
 	public int getId() {
 		return id;
 	}
@@ -57,7 +53,7 @@ public class Texture {
 		return textureId;
 	}
 
-	public void cleanup() {
+	public void delete() {
 		glDeleteTextures(id);
 	}
 

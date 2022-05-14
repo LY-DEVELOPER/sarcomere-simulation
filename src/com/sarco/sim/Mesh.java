@@ -3,13 +3,10 @@ package com.sarco.sim;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static org.lwjgl.opengl.GL30.*;
 
-import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.system.MemoryUtil;
 
@@ -21,7 +18,7 @@ public class Mesh {
 
 	private int vertexCount;
 	private Texture texture;
-	private Vector4f colour = new Vector4f(0.6f, 0, 0, 1);
+	private Vector4f colour = new Vector4f(1, 1, 1, 1);
 
 	public Mesh(float[] positions, float[] texture, float[] normals, int[] indices, int[] joints, float[] weights) {
 		// if weights and joints are not set make empty arrays for them
@@ -115,7 +112,7 @@ public class Mesh {
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	public void cleanUp() {
+	public void delete() {
 		glDisableVertexAttribArray(0);
 
 		// Delete the VBOs
@@ -126,7 +123,7 @@ public class Mesh {
 
 		// Delete the texture
 		if (texture != null) {
-			texture.cleanup();
+			texture.delete();
 		}
 
 		// Delete the VAO

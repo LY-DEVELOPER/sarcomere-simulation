@@ -7,7 +7,7 @@ public class LetterObject extends Object {
 	}
 	
 	// This is required as parent deletes old mesh, this function doesn't
-	public void cleanUp() {
+	public void delete() {
 		this.mesh = null;
 	}
 }
