@@ -16,13 +16,13 @@ public class CreateSceneObjects {
 		ArrayList<Object> objects = new ArrayList<Object>();
 		Mesh skyBox = OBJLoader.loadMesh("/assets/skybox.obj");
 		skyBox.setColour(0.5f, 0.5f, 0.5f, 1);
-		skyBox.setTexture("./textures/skybox.png");
+		skyBox.setTexture(new Texture("./textures/skybox.png"));
 		Mesh grid = OBJLoader.loadMesh("/assets/grid.obj");
-		grid.setTexture("./textures/grid.png");
+		grid.setTexture(new Texture("./textures/grid.png"));
 		Mesh length = OBJLoader.loadMesh("/assets/length.obj");
 		length.setColour(0, 0.7f, 0.7f, 0.5f);
 		Mesh actin = OBJLoader.loadMesh("/assets/actin.obj");
-		actin.setTexture("./textures/texture.png");
+		actin.setTexture(new Texture("./textures/texture.png"));
 		actin.setColour(0, 0.58f, 1f, 1);
 		MD5Model myosin = MD5Model.parse("/assets/mediummyosin.md5mesh");
 		MD5AnimModel animMyo = MD5AnimModel.parse("/assets/myosin.md5anim");

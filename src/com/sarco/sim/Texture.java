@@ -13,44 +13,31 @@ public class Texture {
 
 	private final int id;
 	
-	private static int height;
-	private static int width;
+	private int height;
+	private int width;
 
-	public Texture(String fileName) throws Exception {
-		this(loadTexture(fileName));
-	}
-
-	public Texture(int id) {
-		this.id = id;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	private static int loadTexture(String file) throws Exception {
-		ByteBuffer buf;
+	public Texture(String fileName) {
+		ByteBuffer imageBuffer;
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			IntBuffer w = stack.mallocInt(1);
 			IntBuffer h = stack.mallocInt(1);
 			IntBuffer channels = stack.mallocInt(1);
 			
-			buf = stbi_load(file, w, h, channels, 4);
-			width = w.get();
+			imageBuffer = stbi_load(fileName, w, h, channels, 4);
 			height = h.get();
+			width = w.get();
 		}
 
-		int textureId = glGenTextures();
-		glBindTexture(GL_TEXTURE_2D, textureId);
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		this.id = glGenTextures();
+		glBindTexture(GL_TEXTURE_2D, id);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-		glGenerateMipmap(GL_TEXTURE_2D);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageBuffer);
 
-		stbi_image_free(buf);
+		stbi_image_free(imageBuffer);
+	}
 
-		return textureId;
+	public int getId() {
+		return id;
 	}
 
 	public void delete() {

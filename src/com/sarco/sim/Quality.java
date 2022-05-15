@@ -8,7 +8,7 @@ import lwjglgamedev.modelLoaders.MD5Model;
 
 public class Quality {
 	
-	String setQuality = "Low";
+	private String setQuality = "Low";
 
 	public void set(String quality, ArrayList<Object> objects) throws Exception {
 		// Loads myosin model with matching quality

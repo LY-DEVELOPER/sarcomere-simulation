@@ -3,18 +3,18 @@
 in  vec2 outTexCoord;
 out vec4 fragColour;
 
-uniform sampler2D texture_sampler;
+uniform sampler2D texture;
 uniform vec4 colour;
-uniform int useColour;
+uniform int textured;
 
 void main()
 {
-    if ( useColour == 1 )
+    if ( textured == 1 )
     {
         fragColour = vec4(colour);
     }
     else
     {
-        fragColour = colour * texture(texture_sampler, outTexCoord);
+        fragColour = colour * texture(texture, outTexCoord);
     }
 }

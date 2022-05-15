@@ -30,6 +30,10 @@ public class Mesh {
 				weights[i] = 0;
 			}
 		}
+		//if normals is null create empty float
+		if(normals == null) {
+			normals = new float[0];
+		}
 		// Initialise buffers, they are used as they are more efficient than normal
 		FloatBuffer posBuffer = MemoryUtil.memAllocFloat(positions.length);
 		posBuffer.put(positions).flip();
@@ -129,15 +133,6 @@ public class Mesh {
 		// Delete the VAO
 		glBindVertexArray(0);
 		glDeleteVertexArrays(vao);
-	}
-
-	// Set the texture from file location
-	public void setTexture(String sTexture) {
-		try {
-			this.texture = new Texture(sTexture);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	// Set the texture with existing texture

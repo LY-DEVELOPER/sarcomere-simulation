@@ -18,12 +18,12 @@ public class TextMesh {
 	private void buildMesh() throws Exception {
 		Texture texture = new Texture("./textures/font.png");
 		char c;
-		String text = "";
+		StringBuilder text = new StringBuilder();
 		for (int i = 0; i <= 256; i++) {
 			c = (char) i;
-			text += Character.toString(c);
+			text.append(c);
 		}
-		char[] chars = text.toCharArray();
+		char[] chars = text.toString().toCharArray();
 		List<Mesh> tempMeshes = new ArrayList<>();
 		float tileWidth = (float) texture.getWidth() / (float) 16;
 		float tileHeight = (float) texture.getHeight() / (float) 16;
@@ -32,10 +32,9 @@ public class TextMesh {
 			int col = currChar % 16;
 			int row = currChar / 16;
 
-			List<Float> positions = new ArrayList<Float>();
-			List<Float> textCoords = new ArrayList<Float>();
-			float[] normals = new float[0];
-			List<Integer> indices = new ArrayList<Integer>();
+			List<Float> positions = new ArrayList<>();
+			List<Float> textCoords = new ArrayList<>();
+			List<Integer> indices = new ArrayList<>();
 
 			for (int j = 0; j < 4; j++) {
 				int x = 0;
@@ -65,7 +64,7 @@ public class TextMesh {
 			float[] posArr = listToArray(positions);
 			float[] textCoordsArr = listToArray(textCoords);
 			int[] indicesArr = indices.stream().mapToInt(j -> j).toArray();
-			Mesh mesh = new Mesh(posArr, textCoordsArr, normals, indicesArr, null, null);
+			Mesh mesh = new Mesh(posArr, textCoordsArr, null, indicesArr, null, null);
 			mesh.setTexture(texture);
 			tempMeshes.add(mesh);
 		}

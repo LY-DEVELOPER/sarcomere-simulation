@@ -39,8 +39,7 @@ public class Window {
 
 	boolean resized = false;
 
-	public void init(boolean vysnc) {
-		// TODO Auto-generated method stub
+	public void init(boolean vsync) {
 		glfwSetErrorCallback(errorCallback);
 		if (!glfwInit()) {
 			throw new IllegalStateException("GLFW Failed");
@@ -59,6 +58,7 @@ public class Window {
 			glfwTerminate();
 			throw new RuntimeException("Failed to create the GLFW window");
 		}
+		
 		glfwSetFramebufferSizeCallback(window, (window, width, height) -> {
 			this.width = width;
 			this.height = height;
@@ -71,23 +71,26 @@ public class Window {
 		glfwSetWindowPos(window, (vidmode.width() - width) / 2, (vidmode.height() - height) / 2);
 
 		glfwMakeContextCurrent(window);
-		if (vysnc) {
+		if (vsync) {
 			glfwSwapInterval(1);
 		}
 		glfwShowWindow(window);
 		GL.createCapabilities();
 
 		GLFWImage image = GLFWImage.malloc();
-		GLFWImage.Buffer imagebf = GLFWImage.malloc(1);
-		try {
-			image.set(50, 50, loadImage("./textures/icon.png"));
-			imagebf.put(0, image);
-			glfwSetWindowIcon(window, imagebf);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		GLFWImage.Buffer imageBuffer = GLFWImage.malloc(1);
+		ByteBuffer imageByte;
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			IntBuffer comp = stack.mallocInt(1);
+			IntBuffer w = stack.mallocInt(1);
+			IntBuffer h = stack.mallocInt(1);
 
+			imageByte = stbi_load("./textures/icon.png", w, h, comp, 4);
+		}
+		image.set(50, 50, imageByte);
+		imageBuffer.put(0, image);
+		glfwSetWindowIcon(window, imageBuffer);
+		stbi_image_free(imageByte);
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
@@ -135,20 +138,5 @@ public class Window {
 
 	public void setResized(boolean r) {
 		resized = r;
-	}
-
-	public static ByteBuffer loadImage(String path) throws Exception {
-		ByteBuffer image;
-		try (MemoryStack stack = MemoryStack.stackPush()) {
-			IntBuffer comp = stack.mallocInt(1);
-			IntBuffer w = stack.mallocInt(1);
-			IntBuffer h = stack.mallocInt(1);
-
-			image = stbi_load(path, w, h, comp, 4);
-			if (image == null) {
-				// throw new resource_error("Could not load image resources.");
-			}
-		}
-		return image;
 	}
 }

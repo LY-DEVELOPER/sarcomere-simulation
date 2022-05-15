@@ -15,8 +15,8 @@ public class TextObject {
 
 	private TextMesh textMesh;
 
-	public TextObject(String Text, TextMesh tmesh) throws Exception {
-		this.text = Text;
+	public TextObject(String text, TextMesh tmesh) {
+		this.text = text;
 		this.textMesh = tmesh;
 		getTextMeshes();
 	}
@@ -33,7 +33,6 @@ public class TextObject {
 			letterObjects[i] = new LetterObject(textMesh.getMesh(chars[i]));
 			letterObjects[i].movePosition(position.x + i * 19.2f, position.y, position.z);
 		}
-//		System.out.println(letterObjects.size());
 		this.setScale(scale);
 	}
 
@@ -55,7 +54,10 @@ public class TextObject {
 	}
 
 	public Vector4i getBorders() {
-		int x1, x2, y1, y2;
+		int x1;
+		int x2;
+		int y1;
+		int y2;
 		int size = this.text.length();
 		int width = size * Math.round(64 * this.getScale());
 		x1 = (int) this.getPosition().x;

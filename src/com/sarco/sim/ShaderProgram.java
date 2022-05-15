@@ -11,13 +11,12 @@ import org.lwjgl.system.MemoryStack;
 
 public class ShaderProgram {
 
-    private final int program;
+    private int program;
 
-    private final Map<String, Integer> uniforms;
+    private Map<String, Integer> uniforms  = new HashMap<>();;
 
-    public ShaderProgram(String vertexShader, String fragShader) throws Exception {
+    public ShaderProgram(String vertexShader, String fragShader) {
         program = glCreateProgram();
-        uniforms = new HashMap<>();
         
         int vShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vShader, vertexShader);
@@ -35,9 +34,8 @@ public class ShaderProgram {
         glValidateProgram(program);
     }
     
-    public void createUniform(String uniform) throws Exception {
-        int location = glGetUniformLocation(program, uniform);
-        uniforms.put(uniform, location);
+    public void createUniform(String uniform){
+        uniforms.put(uniform, glGetUniformLocation(program, uniform));
     }
     
     public void setUniform(String uniform, Matrix4f[] matrices) {

@@ -7,11 +7,11 @@ public class Object {
 
 	protected Mesh mesh;
 
-	private final Vector3f position = new Vector3f(0, 0, 0);;
+	private Vector3f position = new Vector3f(0, 0, 0);
 
 	private float scale = 1;
 
-	private final Vector3f rotation = new Vector3f(0, 0, 0);;
+	private Vector3f rotation = new Vector3f(0, 0, 0);
 
 	public Object(Mesh mesh) {
 		this.mesh = mesh;
@@ -28,17 +28,9 @@ public class Object {
 	}
 
 	public void movePosition(float offsetX, float offsetY, float offsetZ) {
-		// Moves the x and z so object moves relative of world and not its rotation
-		if (offsetZ != 0) {
-			position.x += (float) Math.sin(Math.toRadians(rotation.y)) * -1.0f * offsetZ;
-			position.z += (float) Math.cos(Math.toRadians(rotation.y)) * offsetZ;
-		}
-		if (offsetX != 0) {
-			position.x += (float) Math.sin(Math.toRadians(rotation.y - 90)) * -1.0f * offsetX;
-			position.z += (float) Math.cos(Math.toRadians(rotation.y - 90)) * offsetX;
-		}
-		// Moves y
+		position.x += offsetX;
 		position.y += offsetY;
+		position.z += offsetZ;
 	}
 
 	public float getScale() {

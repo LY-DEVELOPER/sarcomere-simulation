@@ -18,41 +18,33 @@ import java.util.ArrayList;
 
 public class Simulation implements Runnable {
 
-	Window window;
-	TimeTracker timer;
-	ShaderProgram shader;
-	ShaderProgram hudShader;
-	Camera camera;
-	Transformations transformation;
+	private Window window;
+	private TimeTracker timer;
+	private ShaderProgram shader;
+	private ShaderProgram hudShader;
+	private Camera camera;
 
-	boolean contract = false;
-	boolean autoPlay = true;
-	boolean moveActin;
-	boolean actinReturn = false;
-	int speed = 100;
-	boolean vsync = true;
-	int fps = 100;
-	float step = 0;
-	int liveFPS;
-	String quality = "Low";
+	private boolean contract = false;
+	private boolean autoPlay = true;
+	private boolean moveActin;
+	private boolean actinReturn = false;
+	private int speed = 100;
+	private boolean vsync = true;
+	private int fps = 100;
+	private float step = 0;
+	private int liveFPS;
+	private String quality = "Low";
 
-	private static final float FOV = (float) Math.toRadians(60.0f);
+	private double mouseX;
+	private double mouseY;
+	private boolean mouseHold;
+	private double lastX;
+	private double lastY;
 
-	private static final float Z_NEAR = 0.01f;
-
-	private static final float Z_FAR = 1000.f;
-
-	double mouseX;
-	double mouseY;
-	boolean mouseHold;
-	double lastX;
-	double lastY;
-
-	ArrayList<Object> objects;
-	ArrayList<TextObject> textObjects;
-	ArrayList<Slider> sliderObjects;
-	TextMesh textMesh;
-	Quality q = new Quality();
+	private ArrayList<Object> objects;
+	private ArrayList<TextObject> textObjects;
+	private ArrayList<Slider> sliderObjects;
+	private Quality q = new Quality();
 
 	@Override
 	public void run() {
@@ -66,50 +58,49 @@ public class Simulation implements Runnable {
 	}
 
 	public void init() throws Exception {
-		//intilialising classes
+		// initialising classes
 		window = new Window();
 		timer = new TimeTracker();
-		transformation = new Transformations();
 		window.init(vsync);
 		camera = new Camera();
-		textMesh = new TextMesh();
+		TextMesh textMesh = new TextMesh();
 		q = new Quality();
-		
-		//Adding input callbacks
+
+		// Adding input callbacks
 		glfwSetKeyCallback(window.getWindow(), keyCallback);
 		glfwSetScrollCallback(window.getWindow(), scrollCallback);
 		glfwSetCursorPosCallback(window.getWindow(), cursorCallback);
 		glfwSetMouseButtonCallback(window.getWindow(), mouseCallback);
-		
-		//adding shaders to shaderprogram
-		shader = new ShaderProgram(LoadShader.load("/assets/vertex.vs"),LoadShader.load("/assets/fragment.fs"));
-		
+
+		// adding shaders to shaderprogram
+		shader = new ShaderProgram(LoadShader.load("/assets/vertex.vs"), LoadShader.load("/assets/fragment.fs"));
+
 		// Creating uniforms for the shaders
-		shader.createUniform("projectionMatrix");
-		shader.createUniform("modelViewMatrix");
-		shader.createUniform("texture_sampler");
+		shader.createUniform("sceneMatrix");
+		shader.createUniform("objectCameraMatrix");
+		shader.createUniform("texture");
 		shader.createUniform("colour");
-		shader.createUniform("useColour");
+		shader.createUniform("textured");
 		shader.createUniform("jointsMatrix");
-		
+		shader.createUniform("animObj");
+
 		// add the shaders programs
-		hudShader = new ShaderProgram(LoadShader.load("/assets/hud_vertex.vs"),LoadShader.load("/assets/fragment.fs"));
-		
-		hudShader.createUniform("projModelMatrix");
+		hudShader = new ShaderProgram(LoadShader.load("/assets/hud_vertex.vs"), LoadShader.load("/assets/fragment.fs"));
+
+		hudShader.createUniform("hudMatrix");
 		hudShader.createUniform("colour");
-		
-		//setting up camera position
+
+		// setting up camera position
 		camera.setRotation(10, 20, 0);
 		camera.setPosition(0, 0, 3);
 		camera.setScale(0.2f);
-		
-		//Calling class that intilises 3D objects
+
+		// Calling class that intilises 3D objects
 		objects = CreateSceneObjects.gen();
-		
-		//Initialising arrays for the ui objects
+
+		// Initialising arrays for the ui objects
 		textObjects = CreateHudObjects.genTexts(textMesh, window);
 		sliderObjects = CreateHudObjects.genSliders(textMesh);
-
 
 		// set view port to screen size
 		glViewport(0, 0, window.getWidth(), window.getHeight());
@@ -118,7 +109,7 @@ public class Simulation implements Runnable {
 	public void simLoop() throws Exception {
 		float timeSince;
 		// array to store fps to then get average
-		ArrayList<Integer> averageFPS = new ArrayList<Integer>();
+		ArrayList<Integer> averageFPS = new ArrayList<>();
 		// while the window is open keep the game loop running
 		while (!window.shouldClose()) {
 			timeSince = timer.getTimeSince();
@@ -132,7 +123,7 @@ public class Simulation implements Runnable {
 					total += i;
 				}
 				liveFPS = total / 10;
-				averageFPS = new ArrayList<Integer>();
+				averageFPS = new ArrayList<>();
 			}
 			// run the loop functions
 			update(timeSince);
@@ -140,30 +131,31 @@ public class Simulation implements Runnable {
 			window.update(vsync);
 			// if vsync is not true run the wait function
 			if (!vsync) {
-				wait((int) Math.round(((float) 1 / (float) fps) * 100));
+				delay();
 			}
 		}
 	}
 
-	public void wait(int ms) {
+	public void delay() {
 		// make the program sleep for as many milliseconds as required to match FPS
 		float waitTime = 1f / fps;
 		double endTime = timer.getLastLoop() + waitTime;
 		while (timer.getSystemTime() < endTime) {
 			try {
 				Thread.sleep(1);
-			} catch (InterruptedException ie) {
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}
 
-	public void update(float timeSince) throws Exception {
+	public void update(float timeSince) {
 		// step is the amount of frames of the animation to play
 		// if animation is slower than fps step will be added to each frame until it
 		// equals 1
-		step += timeSince / (float) (1 / (float) speed);
+		step += timeSince / (1 / (float) speed);
 		if (step >= 1) {
-			int stepInt = (int) Math.round(step);
+			int stepInt = Math.round(step);
 			moveActin = false;
 			// if the actin is fully contracted during autoplay uncontract
 			if (objects.get(3).getPosition().x <= 0.3 && autoPlay) {
@@ -172,7 +164,7 @@ public class Simulation implements Runnable {
 
 			// if contracting play animation and move actin
 			if (objects.get(3).getPosition().x > 0.3 && !actinReturn && contract) {
-				objects.forEach((object) -> {
+				objects.forEach(object -> {
 					if (object instanceof AnimatedObject) {
 						((AnimatedObject) object).nextFrame(stepInt);
 						int frame = ((AnimatedObject) object).getFrameInt();
@@ -191,7 +183,7 @@ public class Simulation implements Runnable {
 				}
 				// if not contracting and not returning set myosin to releaxed state
 			} else if (!actinReturn && !contract) {
-				objects.forEach((object) -> {
+				objects.forEach(object -> {
 					if (object instanceof AnimatedObject) {
 						((AnimatedObject) object).nextFrame(stepInt);
 						int frame = ((AnimatedObject) object).getFrameInt();
@@ -215,7 +207,7 @@ public class Simulation implements Runnable {
 				}
 
 				// return myosin to relaxed state
-				objects.forEach((object) -> {
+				objects.forEach(object -> {
 					if (object instanceof AnimatedObject) {
 						int frame = ((AnimatedObject) object).getFrameInt();
 						if (frame > 0) {
@@ -284,8 +276,8 @@ public class Simulation implements Runnable {
 		objects.get(6).getMesh().setColour(i.x, i.y, i.z, (float) j / 100);
 
 		// update values to match sliders
-		speed = (int) Math.round(sliderObjects.get(4).value * 5);
-		fps = (int) Math.round(sliderObjects.get(5).value * 2 + 20);
+		speed = Math.round(sliderObjects.get(4).value * 5);
+		fps = Math.round(sliderObjects.get(5).value * 2 + 20);
 	}
 
 	public void render() throws Exception {
@@ -303,28 +295,29 @@ public class Simulation implements Runnable {
 		shader.open();
 
 		// set projection matrices
-		Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(),
-				Z_NEAR, Z_FAR);
-		shader.setUniform("projectionMatrix", projectionMatrix);
+		Matrix4f sceneMatrix = Transform.getSceneMatrix(window);
+		shader.setUniform("sceneMatrix", sceneMatrix);
 
-		shader.setUniform("texture_sampler", 0);
+		shader.setUniform("texture", 0);
 
 		// set view matrix
-		Matrix4f viewMatrix = transformation.getViewMatrix(camera);
+		Matrix4f cameraMatrix = Transform.getCameraMatrix(camera);
 
 		// render objects with corresponding uniforms
 		for (Object object : objects) {
-			
+
 			// set transformation matrix
-			Matrix4f modelViewMatrix = transformation.buildModelViewMatrix(object, viewMatrix);
-			shader.setUniform("modelViewMatrix", modelViewMatrix);
+			Matrix4f objectCameraMatrix = Transform.getObjectCameraMatrix(object, cameraMatrix);
+			shader.setUniform("objectCameraMatrix", objectCameraMatrix);
 			shader.setUniform("colour", object.getMesh().getColour());
-			shader.setUniform("useColour", object.getMesh().isTextured() ? 0 : 1);
+			shader.setUniform("textured", object.getMesh().isTextured() ? 0 : 1);
+			shader.setUniform("animObj", 0);
 
 			if (object instanceof AnimatedObject) {
 				AnimatedObject animObject = (AnimatedObject) object;
 				AnimatedFrame frame = animObject.getFrame();
 				shader.setUniform("jointsMatrix", frame.getJointMatrices());
+				shader.setUniform("animObj", 1);
 			}
 
 			object.getMesh().render();
@@ -334,13 +327,13 @@ public class Simulation implements Runnable {
 		hudShader.open();
 
 		// render hud objects with corresponding uniforms
-		Matrix4f hud = transformation.getOrthoProjectionMatrix(0, window.getWidth(), window.getHeight(), 0);
+		Matrix4f hud = Transform.getHudProjectionMatrix(window);
 		for (TextObject object1 : textObjects) {
 			for (Object object : object1.getLetter()) {
 				Mesh mesh = object.getMesh();
 				// Set ortohtaphic and model matrix for this HUD item
-				Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(object, hud);
-				hudShader.setUniform("projModelMatrix", projModelMatrix);
+				Matrix4f hudMatrix = Transform.getHudProjTextMatrix(object, hud);
+				hudShader.setUniform("hudMatrix", hudMatrix);
 				hudShader.setUniform("colour", object.getMesh().getColour());
 				// Render the mesh for this HUD item
 				mesh.render();
@@ -350,8 +343,8 @@ public class Simulation implements Runnable {
 			for (Object object : slide.getPicker().getLetter()) {
 				Mesh mesh = object.getMesh();
 				// Set ortohtaphic and model matrix for this HUD item
-				Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(object, hud);
-				hudShader.setUniform("projModelMatrix", projModelMatrix);
+				Matrix4f hudMatrix = Transform.getHudProjTextMatrix(object, hud);
+				hudShader.setUniform("hudMatrix", hudMatrix);
 				hudShader.setUniform("colour", object.getMesh().getColour());
 				// Render the mesh for this HUD item
 				mesh.render();
@@ -359,8 +352,8 @@ public class Simulation implements Runnable {
 			for (Object object : slide.getBar().getLetter()) {
 				Mesh mesh = object.getMesh();
 				// Set ortohtaphic and model matrix for this HUD item
-				Matrix4f projModelMatrix = transformation.getOrtoProjModelMatrix(object, hud);
-				hudShader.setUniform("projModelMatrix", projModelMatrix);
+				Matrix4f hudMatrix = Transform.getHudProjTextMatrix(object, hud);
+				hudShader.setUniform("hudMatrix", hudMatrix);
 				hudShader.setUniform("colour", object.getMesh().getColour());
 				// Render the mesh for this HUD item
 				mesh.render();
@@ -380,10 +373,8 @@ public class Simulation implements Runnable {
 		// Delete objects
 		window.delete();
 		shader.delete();
-		objects.forEach((object) -> {
-				object.getMesh().delete();
-		});
-		textObjects.forEach((object) -> {
+		objects.forEach(object -> object.getMesh().delete());
+		textObjects.forEach(object -> {
 			for (Object obj : object.getLetter()) {
 				if (obj.getMesh() != null) {
 					obj.getMesh().delete();
@@ -416,11 +407,9 @@ public class Simulation implements Runnable {
 				camera.setScale(0.2f);
 			}
 			if (key == GLFW_KEY_SPACE && !autoPlay && (action == GLFW_PRESS || action == GLFW_RELEASE)) {
-				if (!autoPlay) {
-					contract = !contract;
-					if (actinReturn) {
-						actinReturn = false;
-					}
+				contract = !contract;
+				if (actinReturn) {
+					actinReturn = false;
 				}
 			}
 			if (key == GLFW_KEY_A && action == GLFW_PRESS) {
@@ -607,27 +596,26 @@ public class Simulation implements Runnable {
 		Vector3f col = new Vector3f(0, 0, 0);
 		if (value < (100 / 6)) {
 			col.z = 1;
-			col.y = ((100 / 6) - value) / 100 * 6;
+			col.y = (float) (((100 / (double) 6) - value) / 100 * 6);
 		}
-		if (value >= ((100 / 6)) && value < ((100 / 6) * 2)) {
-			col.x = (value - (100 / 6)) / 100 * 6;
-			;
+		if (value >= (100 / 6) && value < ((100 / 6) * 2)) {
+			col.x = (float) ((value - (100 / (double) 6)) / 100 * 6);
 			col.z = 1;
 		}
 		if (value >= ((100 / 6) * 2) && value < ((100 / 6) * 3)) {
 			col.x = 1;
-			col.z = (((100 / 6) * 3) - value) / 100 * 6;
+			col.z = (float) ((((100 / (double) 6) * 3) - value) / 100 * 6);
 		}
 		if (value >= ((100 / 6) * 3) && value < ((100 / 6) * 4)) {
-			col.y = (value - ((100 / 6) * 3)) / 100 * 6;
+			col.y = (float) ((value - ((100 / (double) 6) * 3)) / 100 * 6);
 			col.x = 1;
 		}
 		if (value >= ((100 / 6) * 4) && value < ((100 / 6) * 5)) {
 			col.y = 1;
-			col.x = (((100 / 6) * 5) - value) / 100 * 6;
+			col.x = (float) ((((100 / (double) 6) * 5) - value) / 100 * 6);
 		}
 		if (value >= ((100 / 6) * 5)) {
-			col.z = (value - ((100 / 6) * 5)) / 100 * 6;
+			col.z = (float) ((value - ((100 / (double) 6) * 5)) / 100 * 6);
 			col.y = 1;
 		}
 
