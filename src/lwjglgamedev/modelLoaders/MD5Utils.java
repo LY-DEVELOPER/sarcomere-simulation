@@ -4,6 +4,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class MD5Utils {
+	
+	// this class is from https://github.com/lwjglgamedev/lwjglbook
 
     public static final String FLOAT_REGEXP = "[+-]?\\d*\\.?\\d*";
 

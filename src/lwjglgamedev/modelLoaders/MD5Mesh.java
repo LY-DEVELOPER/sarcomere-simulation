@@ -8,6 +8,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class MD5Mesh {
+	// this class is from https://github.com/lwjglgamedev/lwjglbook
 
     private static final Pattern PATTERN_SHADER = Pattern.compile("\\s*shader\\s*\\\"([^\\\"]+)\\\"");
 

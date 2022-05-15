@@ -6,6 +6,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MD5Hierarchy {
+	
+	// this class is from https://github.com/lwjglgamedev/lwjglbook
 
     private List<MD5HierarchyData> hierarchyDataList;
 

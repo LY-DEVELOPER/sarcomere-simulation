@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MD5Model {
+	
+	// this class is from https://github.com/lwjglgamedev/lwjglbook
 
     private MD5JointInfo jointInfo;
 

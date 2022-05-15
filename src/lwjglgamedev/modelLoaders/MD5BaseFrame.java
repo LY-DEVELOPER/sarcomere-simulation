@@ -8,6 +8,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class MD5BaseFrame {
+	
+	// this class is from https://github.com/lwjglgamedev/lwjglbook
 
     private List<MD5BaseFrameData> frameDataList;
 

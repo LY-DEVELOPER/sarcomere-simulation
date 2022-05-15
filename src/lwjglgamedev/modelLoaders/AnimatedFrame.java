@@ -4,6 +4,8 @@ import java.util.Arrays;
 import org.joml.Matrix4f;
 
 public class AnimatedFrame {
+	
+	// this class is from https://github.com/lwjglgamedev/lwjglbook
 
     public static final int MAX_JOINTS = 150;
         

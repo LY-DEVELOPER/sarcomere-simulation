@@ -3,6 +3,8 @@ package lwjglgamedev.modelLoaders;
 import java.util.List;
 
 public class MD5ModelHeader {
+	
+	// this class is from https://github.com/lwjglgamedev/lwjglbook
 
     private String version;
 

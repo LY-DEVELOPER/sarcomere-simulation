@@ -13,6 +13,8 @@ import com.sarco.sim.Mesh;
 import com.sarco.sim.Texture;
 
 public class MD5Loader {
+	
+	// this class is from https://github.com/lwjglgamedev/lwjglbook
 
 	/*
 	 * Changes made by Louis Yung, changed AnimGameItem to AnimObject and removed

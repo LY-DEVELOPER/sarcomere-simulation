@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Utils {
+	
+	// this class is from https://github.com/lwjglgamedev/lwjglbook
 
     public static String loadResource(String fileName) throws Exception {
         String result;

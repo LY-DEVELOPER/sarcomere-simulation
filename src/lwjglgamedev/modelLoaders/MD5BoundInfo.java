@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 import org.joml.Vector3f;
 
 public class MD5BoundInfo {
+	
+	// this class is from https://github.com/lwjglgamedev/lwjglbook
 
     private List<MD5Bound> bounds;
 

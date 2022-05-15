@@ -9,6 +9,8 @@ import com.sarco.sim.Mesh;
 
 public class OBJLoader {
 	
+	// this class is from https://github.com/lwjglgamedev/lwjglbook
+	
 	/*
 	 * Changes made by Louis Yung, made mesh construct with null and null at end
 	 */
