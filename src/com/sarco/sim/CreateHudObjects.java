@@ -1,12 +1,14 @@
 package com.sarco.sim;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.joml.Vector3f;
 
 public class CreateHudObjects {
-	public static ArrayList<TextObject> genTexts(TextMesh textMesh, Window window) throws Exception {
-		ArrayList<TextObject> textObjects = new ArrayList<TextObject>();
+	
+	public static List<TextObject> genTexts(TextMesh textMesh, Window window) {
+		ArrayList<TextObject> textObjects = new ArrayList<>();
 		// Adding the ui objects
 		textObjects.add(new TextObject("AutoPlay:On", textMesh));
 		textObjects.get(0).setPosition(10f, 5f, 1);
@@ -68,34 +70,25 @@ public class CreateHudObjects {
 			textObjects.get(i).toggleVis();
 		}
 
-		// This fixes a problem where text needs to be set twice before it shows
-		for (int i = 0; i < textObjects.size(); i++) {
-			textObjects.get(i).fix();
-		}
-
 		// making slider objects invisible
 		return textObjects;
 	}
-	
-	public static ArrayList<Slider> genSliders(TextMesh textMesh) throws Exception {
-		ArrayList<Slider> sliderObjects = new ArrayList<Slider>();
-		
+
+	public static List<Slider> genSliders(TextMesh textMesh) {
+		ArrayList<Slider> sliderObjects = new ArrayList<>();
+
 		// Adding the ui objects
 		sliderObjects.add(new Slider("mColour", new Vector3f(0, 30 * 3 + 5, 1), textMesh));
 		sliderObjects.add(new Slider("mTran", new Vector3f(0, 30 * 5 + 5, 1), 100, textMesh));
 		sliderObjects.add(new Slider("aColour", new Vector3f(0, 30 * 7 + 5, 1), 100, textMesh));
 		sliderObjects.add(new Slider("aTran", new Vector3f(0, 30 * 9 + 5, 1), 100, textMesh));
 
-		sliderObjects.add(new Slider("speed", new Vector3f(0, 30 * 5 + 5, 1), (float) 20, textMesh));
+		sliderObjects.add(new Slider("speed", new Vector3f(0, 30 * 5 + 5, 1), 20, textMesh));
 
 		sliderObjects.add(new Slider("fps", new Vector3f(0, 30 * 7 + 5, 1), 20, textMesh));
 
-
-
 		// making slider objects invisible
-		sliderObjects.forEach((obj) -> {
-			obj.toggleVis();
-		});
+		sliderObjects.forEach(Slider::toggleVis);
 		return sliderObjects;
 	}
 }

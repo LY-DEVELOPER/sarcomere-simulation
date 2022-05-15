@@ -5,7 +5,8 @@ import org.joml.Vector3f;
 
 public class Transform {
 
-    public static Matrix4f getSceneMatrix(Window window) {     
+    public static Matrix4f getSceneMatrix(Window window) {  
+    	// set the perspective for the scene
     	Matrix4f sceneMatrix = new Matrix4f();
         sceneMatrix.identity();
         sceneMatrix.perspective((float) Math.toRadians(65f), (float) window.getWidth() / window.getHeight(), 0.01f, 1000f);
@@ -13,6 +14,7 @@ public class Transform {
     }
     
     public static Matrix4f getCameraMatrix(Camera camera) {
+    	// set the position of the camera
     	Matrix4f cameraMatrix = new Matrix4f();
         cameraMatrix.identity();
         cameraMatrix.translate(0, 0, -camera.getPosition().z);
@@ -22,7 +24,8 @@ public class Transform {
         return cameraMatrix;
     }
     
-    public static Matrix4f getObjectCameraMatrix(Object object, Matrix4f matrix) {
+    public static Matrix4f getObjectCameraMatrix(SimObject object, Matrix4f matrix) {
+    	// set the position of the object relative to the camera
         Vector3f rotation = object.getRotation();
         Matrix4f objectMatrix = new Matrix4f();
         objectMatrix.identity().translate(object.getPosition()).                
@@ -36,13 +39,15 @@ public class Transform {
     }
     
     public static final Matrix4f getHudProjectionMatrix(Window window) {
+    	// set the hud view to be size of screen
     	Matrix4f hudMatrix = new Matrix4f();
         hudMatrix.identity();
         hudMatrix.setOrtho2D(0, window.getWidth(), window.getHeight(), 0);
         return hudMatrix;
     }
     
-    public static Matrix4f getHudProjTextMatrix(Object object, Matrix4f hudMatrix) {
+    public static Matrix4f getHudProjTextMatrix(SimObject object, Matrix4f hudMatrix) {
+    	// set the postition of the text objects
         Matrix4f textMatrix = new Matrix4f();
         textMatrix.identity().translate(object.getPosition()).scale(object.getScale());
         Matrix4f hudMatrixCurr = new Matrix4f(hudMatrix);

@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 public class LoadShader {
 	public static String load(String file) throws Exception {
+		// convert text file to string
 		String shader;
         try (InputStream in = LoadShader.class.getResourceAsStream(file);
              Scanner scanner = new Scanner(in, java.nio.charset.StandardCharsets.UTF_8.name())) {

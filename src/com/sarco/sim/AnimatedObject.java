@@ -4,7 +4,7 @@ import java.util.List;
 
 import lwjglgamedev.modelLoaders.AnimatedFrame;
 
-public class AnimatedObject extends Object {
+public class AnimatedObject extends SimObject {
 	  private int currentFrame = 0;
 	  private List<AnimatedFrame> frames;
 

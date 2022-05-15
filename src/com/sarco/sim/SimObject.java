@@ -3,7 +3,7 @@ package com.sarco.sim;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-public class Object {
+public class SimObject {
 
 	protected Mesh mesh;
 
@@ -13,7 +13,7 @@ public class Object {
 
 	private Vector3f rotation = new Vector3f(0, 0, 0);
 
-	public Object(Mesh mesh) {
+	public SimObject(Mesh mesh) {
 		this.mesh = mesh;
 	}
 	

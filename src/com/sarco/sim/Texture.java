@@ -1,7 +1,6 @@
 package com.sarco.sim;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 import static org.lwjgl.stb.STBImage.*;
 
 import java.nio.ByteBuffer;
@@ -17,6 +16,7 @@ public class Texture {
 	private int width;
 
 	public Texture(String fileName) {
+		// load image to bytebuffer
 		ByteBuffer imageBuffer;
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			IntBuffer w = stack.mallocInt(1);
@@ -27,7 +27,8 @@ public class Texture {
 			height = h.get();
 			width = w.get();
 		}
-
+		
+		//send texture to GPU
 		this.id = glGenTextures();
 		glBindTexture(GL_TEXTURE_2D, id);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

@@ -1,6 +1,7 @@
 package com.sarco.sim;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import lwjglgamedev.modelLoaders.MD5AnimModel;
 import lwjglgamedev.modelLoaders.MD5Loader;
@@ -10,10 +11,10 @@ import lwjglgamedev.modelLoaders.OBJLoader;
 public class CreateSceneObjects {
 
 	
-	public static ArrayList<Object> gen() throws Exception {
+	public static List<SimObject> gen() throws Exception {
 		
 		//Initialise the meshes
-		ArrayList<Object> objects = new ArrayList<Object>();
+		ArrayList<SimObject> objects = new ArrayList<>();
 		Mesh skyBox = OBJLoader.loadMesh("/assets/skybox.obj");
 		skyBox.setColour(0.5f, 0.5f, 0.5f, 1);
 		skyBox.setTexture(new Texture("./textures/skybox.png"));
@@ -28,21 +29,21 @@ public class CreateSceneObjects {
 		MD5AnimModel animMyo = MD5AnimModel.parse("/assets/myosin.md5anim");
 		
 		//Initialise the objs
-		objects.add(new Object(skyBox));
+		objects.add(new SimObject(skyBox));
 		objects.get(0).setScale(20f);
-		objects.add(new Object(grid));
+		objects.add(new SimObject(grid));
 		objects.get(1).setPosition(0, -6, 0);
 		objects.get(1).setScale(20);
-		objects.add(new Object(length));
+		objects.add(new SimObject(length));
 		objects.get(2).setPosition(0, 1, 0);
-		objects.add(new Object(actin));
+		objects.add(new SimObject(actin));
 		objects.get(3).setPosition(5, 0.38f, 0);
-		objects.add(new Object(actin));
+		objects.add(new SimObject(actin));
 		objects.get(4).setPosition(5, -0.38f, 0);
-		objects.add(new Object(actin));
+		objects.add(new SimObject(actin));
 		objects.get(5).setRotation(0, 180, 0);
 		objects.get(5).setPosition(-5, 0.38f, 0);
-		objects.add(new Object(actin));
+		objects.add(new SimObject(actin));
 		objects.get(6).setRotation(0, 180, 0);
 		objects.get(6).setPosition(-5, -0.38f, 0);
 		

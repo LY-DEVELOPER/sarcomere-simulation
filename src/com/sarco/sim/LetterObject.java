@@ -1,6 +1,6 @@
 package com.sarco.sim;
 
-public class LetterObject extends Object {
+public class LetterObject extends SimObject {
 	
 	public LetterObject(Mesh mesh) {
 		super(mesh);

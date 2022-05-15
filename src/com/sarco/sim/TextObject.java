@@ -22,13 +22,16 @@ public class TextObject {
 	}
 
 	public void getTextMeshes() {
+		// delete old text objects
 		if (letterObjects != null) {
 			for (int i = 0; i < letterObjects.length; i++) {
 				letterObjects[i].delete();
 			}
 		}
+		// get the chars of text
 		char[] chars = text.toCharArray();
 		letterObjects = new LetterObject[chars.length];
+		// get the textMesh of char and add to letter object
 		for (int i = 0; i < chars.length; i++) {
 			letterObjects[i] = new LetterObject(textMesh.getMesh(chars[i]));
 			letterObjects[i].movePosition(position.x + i * 19.2f, position.y, position.z);
@@ -54,6 +57,7 @@ public class TextObject {
 	}
 
 	public Vector4i getBorders() {
+		// find the borders of the text object for checking if mouse is inside borders
 		int x1;
 		int x2;
 		int y1;
@@ -108,10 +112,6 @@ public class TextObject {
 
 	public float getScale() {
 		return scale;
-	}
-	
-	public void fix() {
-		getTextMeshes();
 	}
 
 	public void moveDown(float amount) {

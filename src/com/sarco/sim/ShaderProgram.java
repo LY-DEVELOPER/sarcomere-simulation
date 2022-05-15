@@ -13,21 +13,25 @@ public class ShaderProgram {
 
     private int program;
 
-    private Map<String, Integer> uniforms  = new HashMap<>();;
+    private Map<String, Integer> uniforms  = new HashMap<>();
 
     public ShaderProgram(String vertexShader, String fragShader) {
+    	// get id for program
         program = glCreateProgram();
         
+        // add vertex shader
         int vShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vShader, vertexShader);
         glCompileShader(vShader);
         glAttachShader(program, vShader);
 
+        // add fragment shader
         int fShader = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(fShader, fragShader);
         glCompileShader(fShader);
         glAttachShader(program, fShader);
         
+        // link fragment and vertex shader to program
         glLinkProgram(program);
         glDetachShader(program, vShader);
         glDetachShader(program, fShader);
@@ -35,10 +39,12 @@ public class ShaderProgram {
     }
     
     public void createUniform(String uniform){
+    	//create uniform and add to hashmap
         uniforms.put(uniform, glGetUniformLocation(program, uniform));
     }
     
     public void setUniform(String uniform, Matrix4f[] matrices) {
+    	// Add matrices to to uniform
         try (MemoryStack stack = MemoryStack.stackPush()) {
             int length = matrices != null ? matrices.length : 0;
             FloatBuffer fb = stack.mallocFloat(16 * length); 
@@ -50,17 +56,19 @@ public class ShaderProgram {
     }
 
     public void setUniform(String uniform, Matrix4f value) {
+    	// add matrix to uniform
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            glUniformMatrix4fv(uniforms.get(uniform), false,
-                               value.get(stack.mallocFloat(16)));
+            glUniformMatrix4fv(uniforms.get(uniform), false, value.get(stack.mallocFloat(16)));
         }
     }
     
     public void setUniform(String uniform, Vector4f value) {
+    	// add vector 4 to uniform
         glUniform4f(uniforms.get(uniform), value.x, value.y, value.z, value.w);
     }
     
     public void setUniform(String uniform, int value) {
+    	// add int to uniform
         glUniform1i(uniforms.get(uniform), value);
     }
     

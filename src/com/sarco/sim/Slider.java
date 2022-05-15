@@ -10,34 +10,30 @@ public class Slider {
 	TextObject bar;
 	TextObject picker;
 	
-	public Slider(String id, Vector3f position, float value, TextMesh meshes) throws Exception {
+	public Slider(String id, Vector3f position, float value, TextMesh meshes) {
 		this.id = id;
 		this.value = value;
+		// create bar for slider
 		bar = new TextObject(" \23\23\23\23\23\23\23\23\23\23\23 ", meshes);
-		picker = new TextObject("\22", meshes);
 		bar.setPosition(position.x, position.y, position.z);
 		bar.setScale(0.3f);
+		// create picker for slider
+		picker = new TextObject("\22", meshes);
 		picker.setPosition(position.x + (192 * (value / 100)) + (0.3f*64), position.y, position.z);
 		picker.setScale(0.3f);
-		
-		picker.fix();
-		bar.fix();
 	}
 
-	public Slider(String id, Vector3f position, TextMesh meshes) throws Exception {
+	public Slider(String id, Vector3f position, TextMesh meshes) {
 		this(id, position, 50, meshes);
 	}
 	
-	public void moveDown(float amount) {
-		bar.movePosition(0, amount * 35, 0);
-		picker.movePosition(0, amount * 35, 0);
-	}
-	
 	public void pickerClick(int x) {
+		// set picker to mouse x
 		if (value >= 0 && value <= 100) {
 			picker.setPosition(x - 9, picker.getPosition().y, picker.getPosition().z);
 			value = Math.round(((x - bar.getPosition().x) + (0.3f*-64 - 9)) / 1.92); 
 		}
+		// keeps picker between 0 and 100
 		if(value < 0) {
 			value = 0f;
 			picker.setPosition(bar.getPosition().x + (0.3f*64), picker.getPosition().y, picker.getPosition().z);

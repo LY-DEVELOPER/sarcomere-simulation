@@ -5,37 +5,27 @@ import java.util.List;
 
 public class TextMesh {
 
-	private Mesh[] meshes;
+	private List<Mesh> meshes;
 
 	public TextMesh() {
-		try {
-			buildMesh();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void buildMesh() throws Exception {
+		// get font texture
 		Texture texture = new Texture("./textures/font.png");
-		char c;
-		StringBuilder text = new StringBuilder();
-		for (int i = 0; i <= 256; i++) {
-			c = (char) i;
-			text.append(c);
-		}
-		char[] chars = text.toString().toCharArray();
-		List<Mesh> tempMeshes = new ArrayList<>();
+		meshes = new ArrayList<>();
+		// get tiles of font
 		float tileWidth = (float) texture.getWidth() / (float) 16;
 		float tileHeight = (float) texture.getHeight() / (float) 16;
+		//for each character create a mesh
 		for (int i = 0; i < 256; i++) {
-			char currChar = chars[i];
-			int col = currChar % 16;
-			int row = currChar / 16;
-
+			// gets location of current chat
+			int col = i % 16;
+			int row = i / 16;
+			
+			// create lists to store data
 			List<Float> positions = new ArrayList<>();
 			List<Float> textCoords = new ArrayList<>();
 			List<Integer> indices = new ArrayList<>();
-
+			
+			// creates 4 verticies for each corner of letter
 			for (int j = 0; j < 4; j++) {
 				int x = 0;
 				int y = 0;
@@ -53,26 +43,27 @@ public class TextMesh {
 				}
 
 				positions.add(0.0f);
+				// sets texture coords to location of letter
 				textCoords.add((float) (col + x) / (float) 16);
 				textCoords.add((float) (row + y) / (float) 16);
 				indices.add(j);
 			}
-
 			indices.add(0);
 			indices.add(2);
 
+			// add lists to arrays
 			float[] posArr = listToArray(positions);
 			float[] textCoordsArr = listToArray(textCoords);
 			int[] indicesArr = indices.stream().mapToInt(j -> j).toArray();
+			//create the mesh
 			Mesh mesh = new Mesh(posArr, textCoordsArr, null, indicesArr, null, null);
 			mesh.setTexture(texture);
-			tempMeshes.add(mesh);
+			meshes.add(mesh);
 		}
-		this.meshes = meshToArray(tempMeshes);
 	}
 
 	public Mesh getMesh(int num) {
-		return meshes[num];
+		return meshes.get(num);
 	}
 
 	public static float[] listToArray(List<Float> list) {
@@ -84,12 +75,4 @@ public class TextMesh {
 		return floatArr;
 	}
 
-	public static Mesh[] meshToArray(List<Mesh> mesh) {
-		int size = mesh != null ? mesh.size() : 0;
-		Mesh[] meshArr = new Mesh[size];
-		for (int i = 0; i < size; i++) {
-			meshArr[i] = mesh.get(i);
-		}
-		return meshArr;
-	}
 }

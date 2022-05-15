@@ -20,7 +20,7 @@ public class Simulation implements Runnable {
 
 	private Window window;
 	private TimeTracker timer;
-	private ShaderProgram shader;
+	private ShaderProgram sceneShader;
 	private ShaderProgram hudShader;
 	private Camera camera;
 
@@ -33,7 +33,7 @@ public class Simulation implements Runnable {
 	private int fps = 100;
 	private float step = 0;
 	private int liveFPS;
-	private String quality = "Low";
+	private String quality = "Medium";
 
 	private double mouseX;
 	private double mouseY;
@@ -41,7 +41,7 @@ public class Simulation implements Runnable {
 	private double lastX;
 	private double lastY;
 
-	private ArrayList<Object> objects;
+	private ArrayList<SimObject> objects;
 	private ArrayList<TextObject> textObjects;
 	private ArrayList<Slider> sliderObjects;
 	private Quality q = new Quality();
@@ -72,21 +72,18 @@ public class Simulation implements Runnable {
 		glfwSetCursorPosCallback(window.getWindow(), cursorCallback);
 		glfwSetMouseButtonCallback(window.getWindow(), mouseCallback);
 
-		// adding shaders to shaderprogram
-		shader = new ShaderProgram(LoadShader.load("/assets/vertex.vs"), LoadShader.load("/assets/fragment.fs"));
-
-		// Creating uniforms for the shaders
-		shader.createUniform("sceneMatrix");
-		shader.createUniform("objectCameraMatrix");
-		shader.createUniform("texture");
-		shader.createUniform("colour");
-		shader.createUniform("textured");
-		shader.createUniform("jointsMatrix");
-		shader.createUniform("animObj");
-
-		// add the shaders programs
+		// adding shaders to shaderprograms
+		sceneShader = new ShaderProgram(LoadShader.load("/assets/vertex.vs"), LoadShader.load("/assets/fragment.fs"));
 		hudShader = new ShaderProgram(LoadShader.load("/assets/hud_vertex.vs"), LoadShader.load("/assets/fragment.fs"));
 
+		// Creating uniforms for the shaders
+		sceneShader.createUniform("sceneMatrix");
+		sceneShader.createUniform("objectCameraMatrix");
+		sceneShader.createUniform("texture");
+		sceneShader.createUniform("colour");
+		sceneShader.createUniform("textured");
+		sceneShader.createUniform("jointsMatrix");
+		sceneShader.createUniform("animObj");
 		hudShader.createUniform("hudMatrix");
 		hudShader.createUniform("colour");
 
@@ -95,12 +92,12 @@ public class Simulation implements Runnable {
 		camera.setPosition(0, 0, 3);
 		camera.setScale(0.2f);
 
-		// Calling class that intilises 3D objects
-		objects = CreateSceneObjects.gen();
+		// Calling class that initialises 3D objects
+		objects = (ArrayList<SimObject>) CreateSceneObjects.gen();
 
 		// Initialising arrays for the ui objects
-		textObjects = CreateHudObjects.genTexts(textMesh, window);
-		sliderObjects = CreateHudObjects.genSliders(textMesh);
+		textObjects = (ArrayList<TextObject>) CreateHudObjects.genTexts(textMesh, window);
+		sliderObjects = (ArrayList<Slider>) CreateHudObjects.genSliders(textMesh);
 
 		// set view port to screen size
 		glViewport(0, 0, window.getWidth(), window.getHeight());
@@ -178,8 +175,8 @@ public class Simulation implements Runnable {
 					float amount = (float) (0.058 / 30) * stepInt;
 					objects.get(3).movePosition(-amount, 0, 0);
 					objects.get(4).movePosition(-amount, 0, 0);
-					objects.get(5).movePosition(-amount, 0, 0);
-					objects.get(6).movePosition(-amount, 0, 0);
+					objects.get(5).movePosition(amount, 0, 0);
+					objects.get(6).movePosition(amount, 0, 0);
 				}
 				// if not contracting and not returning set myosin to releaxed state
 			} else if (!actinReturn && !contract) {
@@ -198,8 +195,8 @@ public class Simulation implements Runnable {
 					float amount = (float) (0.058 / 30) * stepInt;
 					objects.get(3).movePosition(amount, 0, 0);
 					objects.get(4).movePosition(amount, 0, 0);
-					objects.get(5).movePosition(amount, 0, 0);
-					objects.get(6).movePosition(amount, 0, 0);
+					objects.get(5).movePosition(-amount, 0, 0);
+					objects.get(6).movePosition(-amount, 0, 0);
 					// once fully returned and auto play is true start contracting again
 				} else if (autoPlay) {
 					contract = true;
@@ -261,7 +258,7 @@ public class Simulation implements Runnable {
 		textObjects.get(16).setText("Target FPS:" + fps);
 
 		// update object colours to match sliders
-		for (Object object : objects) {
+		for (SimObject object : objects) {
 			if (object instanceof AnimatedObject) {
 				Vector3f i = valueToColour(sliderObjects.get(0).value);
 				int j = (int) sliderObjects.get(1).value;
@@ -292,46 +289,46 @@ public class Simulation implements Runnable {
 			glViewport(0, 0, window.getWidth(), window.getHeight());
 			window.setResized(false);
 		}
-		shader.open();
+		sceneShader.open();
 
 		// set projection matrices
 		Matrix4f sceneMatrix = Transform.getSceneMatrix(window);
-		shader.setUniform("sceneMatrix", sceneMatrix);
+		sceneShader.setUniform("sceneMatrix", sceneMatrix);
 
-		shader.setUniform("texture", 0);
+		sceneShader.setUniform("texture", 0);
 
-		// set view matrix
+		// set camera matrix
 		Matrix4f cameraMatrix = Transform.getCameraMatrix(camera);
 
 		// render objects with corresponding uniforms
-		for (Object object : objects) {
+		for (SimObject object : objects) {
 
 			// set transformation matrix
 			Matrix4f objectCameraMatrix = Transform.getObjectCameraMatrix(object, cameraMatrix);
-			shader.setUniform("objectCameraMatrix", objectCameraMatrix);
-			shader.setUniform("colour", object.getMesh().getColour());
-			shader.setUniform("textured", object.getMesh().isTextured() ? 0 : 1);
-			shader.setUniform("animObj", 0);
+			sceneShader.setUniform("objectCameraMatrix", objectCameraMatrix);
+			sceneShader.setUniform("colour", object.getMesh().getColour());
+			sceneShader.setUniform("textured", object.getMesh().isTextured() ? 0 : 1);
+			sceneShader.setUniform("animObj", 0);
 
 			if (object instanceof AnimatedObject) {
 				AnimatedObject animObject = (AnimatedObject) object;
 				AnimatedFrame frame = animObject.getFrame();
-				shader.setUniform("jointsMatrix", frame.getJointMatrices());
-				shader.setUniform("animObj", 1);
+				sceneShader.setUniform("jointsMatrix", frame.getJointMatrices());
+				sceneShader.setUniform("animObj", 1);
 			}
 
 			object.getMesh().render();
 		}
-		shader.close();
+		sceneShader.close();
 
 		hudShader.open();
 
 		// render hud objects with corresponding uniforms
 		Matrix4f hud = Transform.getHudProjectionMatrix(window);
 		for (TextObject object1 : textObjects) {
-			for (Object object : object1.getLetter()) {
+			for (SimObject object : object1.getLetter()) {
 				Mesh mesh = object.getMesh();
-				// Set ortohtaphic and model matrix for this HUD item
+				// Set matrices
 				Matrix4f hudMatrix = Transform.getHudProjTextMatrix(object, hud);
 				hudShader.setUniform("hudMatrix", hudMatrix);
 				hudShader.setUniform("colour", object.getMesh().getColour());
@@ -340,18 +337,18 @@ public class Simulation implements Runnable {
 			}
 		}
 		for (Slider slide : sliderObjects) {
-			for (Object object : slide.getPicker().getLetter()) {
+			for (SimObject object : slide.getPicker().getLetter()) {
 				Mesh mesh = object.getMesh();
-				// Set ortohtaphic and model matrix for this HUD item
+				// Set matrices
 				Matrix4f hudMatrix = Transform.getHudProjTextMatrix(object, hud);
 				hudShader.setUniform("hudMatrix", hudMatrix);
 				hudShader.setUniform("colour", object.getMesh().getColour());
 				// Render the mesh for this HUD item
 				mesh.render();
 			}
-			for (Object object : slide.getBar().getLetter()) {
+			for (SimObject object : slide.getBar().getLetter()) {
 				Mesh mesh = object.getMesh();
-				// Set ortohtaphic and model matrix for this HUD item
+				// Set matrices
 				Matrix4f hudMatrix = Transform.getHudProjTextMatrix(object, hud);
 				hudShader.setUniform("hudMatrix", hudMatrix);
 				hudShader.setUniform("colour", object.getMesh().getColour());
@@ -372,10 +369,10 @@ public class Simulation implements Runnable {
 	public void delete() {
 		// Delete objects
 		window.delete();
-		shader.delete();
+		sceneShader.delete();
 		objects.forEach(object -> object.getMesh().delete());
 		textObjects.forEach(object -> {
-			for (Object obj : object.getLetter()) {
+			for (SimObject obj : object.getLetter()) {
 				if (obj.getMesh() != null) {
 					obj.getMesh().delete();
 				}
@@ -407,12 +404,14 @@ public class Simulation implements Runnable {
 				camera.setScale(0.2f);
 			}
 			if (key == GLFW_KEY_SPACE && !autoPlay && (action == GLFW_PRESS || action == GLFW_RELEASE)) {
+				// contract the sarcomere
 				contract = !contract;
 				if (actinReturn) {
 					actinReturn = false;
 				}
 			}
 			if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+				// toggle autoplay
 				autoPlay = !autoPlay;
 				contract = true;
 				if (actinReturn) {
@@ -429,18 +428,22 @@ public class Simulation implements Runnable {
 	private GLFWMouseButtonCallback mouseCallback = new GLFWMouseButtonCallback() {
 		@Override
 		public void invoke(long window, int button, int action, int mods) {
+			//set mouse hold
 			if (button == GLFW_MOUSE_BUTTON_LEFT && GLFW_PRESS == action) {
 				mouseHold = true;
 				lastX = mouseX;
 				lastY = mouseY;
 			}
+			//set mout release
 			if (button == GLFW_MOUSE_BUTTON_LEFT && GLFW_RELEASE == action) {
 				mouseHold = false;
 				lastX = mouseX;
 				lastY = mouseY;
 			}
 			if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+				// if mouse clickers slider
 				for (Slider obj : sliderObjects) {
+					// move slider to mouse
 					if (obj.getBar().isMouseOver(mouseX, mouseY)) {
 						obj.pickerClick((int) mouseX);
 					}
@@ -448,6 +451,7 @@ public class Simulation implements Runnable {
 				for (TextObject obj : textObjects) {
 					if (obj.isMouseOver(mouseX, mouseY)) {
 						mouseHold = false;
+						// toggle autoplay
 						if (obj.getText().contains("AutoPlay:")) {
 							autoPlay = !autoPlay;
 							contract = true;
@@ -459,14 +463,17 @@ public class Simulation implements Runnable {
 								contract = false;
 							}
 						}
+						// toggle vsync
 						if (obj.getText().contains("vsync:") || obj.getText().equals("vsync:")) {
 							vsync = !vsync;
 						}
+						// re centre camera
 						if (obj.getText().equals("Re-Centre Camera")) {
 							camera.setRotation(0, 0, 0);
 							camera.setPosition(0, 0, 3);
 							camera.setScale(0.2f);
 						}
+						// toggle quality
 						if (obj.getText().contains("Quality")) {
 							if (obj.getText().contains("Low")) {
 								quality = "Medium";
@@ -476,7 +483,7 @@ public class Simulation implements Runnable {
 								quality = "Low";
 							}
 						}
-						if (obj.getText().equals("Appearance \21")) {
+						if (obj.getText().equals("Appearance \21")) { // open appearance menu
 							for (int i = 8; i < 12; i++) {
 								textObjects.get(i).toggleVis();
 							}
@@ -493,7 +500,7 @@ public class Simulation implements Runnable {
 								sliderObjects.get(i).moveDown(8);
 							}
 							obj.setText("Appearance \20");
-						} else if (obj.getText().equals("Appearance \20")) {
+						} else if (obj.getText().equals("Appearance \20")) { // close appearance menu
 							for (int i = 8; i < 12; i++) {
 								textObjects.get(i).toggleVis();
 							}
@@ -511,7 +518,7 @@ public class Simulation implements Runnable {
 							}
 							obj.setText("Appearance \21");
 						}
-						if (obj.getText().equals("View \21")) {
+						if (obj.getText().equals("View \21")) { // open view menu
 							for (int i = 12; i < 14; i++) {
 								textObjects.get(i).toggleVis();
 							}
@@ -525,7 +532,7 @@ public class Simulation implements Runnable {
 								sliderObjects.get(i).moveDown(3);
 							}
 							obj.setText("View \20");
-						} else if (obj.getText().equals("View \20")) {
+						} else if (obj.getText().equals("View \20")) {// close view menu
 							for (int i = 12; i < 14; i++) {
 								textObjects.get(i).toggleVis();
 							}
@@ -540,7 +547,7 @@ public class Simulation implements Runnable {
 							}
 							obj.setText("View \21");
 						}
-						if (obj.getText().equals("Performance \21")) {
+						if (obj.getText().equals("Performance \21")) { // open performance menu
 							for (int i = 14; i < 17; i++) {
 								textObjects.get(i).toggleVis();
 							}
@@ -553,7 +560,7 @@ public class Simulation implements Runnable {
 								sliderObjects.get(i).moveDown(4);
 							}
 							obj.setText("Performance \20");
-						} else if (obj.getText().equals("Performance \20")) {
+						} else if (obj.getText().equals("Performance \20")) { // close performance menu
 							for (int i = 14; i < 17; i++) {
 								textObjects.get(i).toggleVis();
 							}
@@ -567,12 +574,12 @@ public class Simulation implements Runnable {
 							}
 							obj.setText("Performance \21");
 						}
-						if (obj.getText().equals("Controls \21")) {
+						if (obj.getText().equals("Controls \21")) { // open controls menu
 							for (int i = 17; i < 23; i++) {
 								textObjects.get(i).toggleVis();
 							}
 							obj.setText("Controls \20");
-						} else if (obj.getText().equals("Controls \20")) {
+						} else if (obj.getText().equals("Controls \20")) { // close controls menu
 							for (int i = 17; i < 23; i++) {
 								textObjects.get(i).toggleVis();
 							}
@@ -593,6 +600,7 @@ public class Simulation implements Runnable {
 	};
 
 	public Vector3f valueToColour(float value) {
+		// convert slider colour to rgb value
 		Vector3f col = new Vector3f(0, 0, 0);
 		if (value < (100 / 6)) {
 			col.z = 1;
@@ -635,13 +643,16 @@ public class Simulation implements Runnable {
 			float mouseMoveY = ((float) lastX - (float) mouseX);
 			mouseMoveY *= -1;
 			mouseMoveY *= 0.5f;
+			// if mouse held
 			if (mouseHold) {
+				// if mouse on slider move slider
 				for (Slider obj : sliderObjects) {
 					if (obj.getBar().isMouseOver(mouseX, mouseY)) {
 						obj.pickerClick((int) mouseX);
 						mouseOnSlider = true;
 					}
 				}
+				// if mouse not on slider move camera
 				if (!mouseOnSlider) {
 					camera.moveRotation(mouseMoveX, mouseMoveY, 0);
 					lastX = mouseX;
